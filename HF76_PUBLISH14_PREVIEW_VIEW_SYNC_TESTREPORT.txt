@@ -1,0 +1,29 @@
+easyIT Enterprise RC1.8-FC1-HF76 – PUBLISH14
+Realvorschau / Standardansicht Synchronisation
+
+Fehlerbild
+-----------
+Im DataForm-Editor konnte unter "Standardansicht" Formular gewählt sein, während die eingebettete Realvorschau weiterhin die Tabellenansicht zeigte und sich dort als Tabelle bezeichnete.
+
+Ursache
+-------
+Die Realvorschau startete nur mit project/dataform/embed/preview. Die aktuell im Editor sichtbare Standardansicht wurde dem iframe nicht ausdrücklich übergeben. Außerdem reagierte die Vorschau nicht auf eine noch nicht gespeicherte Änderung des Auswahlfelds. Der normale Runtime-Untermenüpunkt "Tabelle" blieb auch im Preview sichtbar und konnte die Vorschau zusätzlich von der konfigurierten Ansicht wegführen.
+
+Korrektur
+---------
+1. Der Preview-iframe erhält beim Laden explizit runtime_view=<gespeicherte Standardansicht>.
+2. Änderungen des Feldes view_mode aktualisieren den iframe sofort auf table/form/dialog, ohne die Einstellung bereits zu speichern.
+3. Der Preview-Status kennzeichnet eine noch nicht gespeicherte Auswahl eindeutig.
+4. Der manuelle Preview-Refresh behält die aktuell ausgewählte Ansicht bei.
+5. Im Preview-Modus wird die normale Runtime-Subnavigation mit dem Tabellen-Umschalter nicht gerendert.
+6. Die Runtime weist die aktive Ansicht im Preview eindeutig als Realvorschau der aktuell gewählten DataForm-Ansicht aus.
+
+Prüfungen
+---------
+PUBLISH14-Spezialtest: 11/11 PASS
+PUBLISH13 View-Mode-Test: 16/16 PASS
+PUBLISH9 iframe-Preview-Test: 12/12 PASS
+PUBLISH11 Kindformular-Preview-Test: 15/15 PASS
+Gesamte Testsuite: 149/149 PASS
+PHP-Syntax: 858/858 PASS
+JavaScript-Syntax: 5/5 PASS

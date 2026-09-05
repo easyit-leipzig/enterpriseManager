@@ -1,0 +1,20 @@
+<?php
+$root=__DIR__;
+require_once $root.'/system/ui/ButtonRegistry.php';
+$runtime=(string)file_get_contents($root.'/products/dataform/runtime.php');
+$css=(string)file_get_contents($root.'/assets/css/easyit-crud-3d-buttons.css');
+$js=(string)file_get_contents($root.'/assets/js/easyit-button-registry.js');
+$checks=[];
+$check=function(string $name,bool $ok)use(&$checks){$checks[]=$ok;echo ($ok?'[PASS] ':'[FAIL] ').$name.PHP_EOL;};
+$check('runtime loads central button registry JS',str_contains($runtime,'assets/js/easyit-button-registry.js'));
+$check('DataForm open explicitly uses formular image key',str_contains($runtime,"easyit_button_attributes('formular','dataform')"));
+$check('DataForm open central title',easyit_button_title('formular','dataform')==='DataForm öffnen');
+$check('Records action explicitly uses anzeigen image key',str_contains($runtime,"easyit_button_attributes('anzeigen','dataform_records')"));
+$check('Records action central title',easyit_button_title('anzeigen','dataform_records')==='Datensätze anzeigen');
+$check('Records action carries semantic hidden label',str_contains($runtime,'<span aria-hidden="true">Datensätze anzeigen</span>'));
+$check('Delete explicit image key via helper',str_contains($runtime,"easyit_button_attributes('loeschen','dataform')"));
+$check('formular registry CSS points to formular.png',str_contains($css,'[data-button="formular"]{--easyit-button-image:url("../img/formular.png")}'));
+$check('anzeigen registry CSS points to anzeigen.png',str_contains($css,'[data-button="anzeigen"]{--easyit-button-image:url("../img/anzeigen.png")}'));
+$check('normaler_ds remains registered for record navigation',str_contains($css,'[data-button="normaler_ds"]{--easyit-button-image:url("../img/normaler_ds.png")}'));
+$check('JS explicit data-button validates DS scope',str_contains($js,'RECORD_NAV_TYPES.has(explicit)') && str_contains($js,'isRecordNavigationControl(el)'));
+if(in_array(false,$checks,true)){exit(1);} echo 'HF76-FIX3 DataForm action button mapping: '.count($checks).'/'.count($checks).' PASS'.PHP_EOL;

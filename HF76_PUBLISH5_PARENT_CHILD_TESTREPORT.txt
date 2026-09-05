@@ -1,0 +1,21 @@
+HF76-PUBLISH5 – Parent/Child Runtime Test Report
+
+Scope:
+- minimal exported HTML5/DataForm runtime
+- 1:n parent/child relation handling
+- reload-free parent record selection
+- child record listing, navigation and creation context
+
+Targeted parent/child checks: 12/12 PASS
+Full root regression: 140/140 PASS
+PHP lint: 847/847 PASS
+JavaScript syntax: 5/5 PASS
+
+Core guarantees:
+- source_dataform_id is treated as parent for enabled 1:n relations
+- target_dataform_id is treated as child
+- lookup_field_id in child is matched against selected parent record ID
+- every matching child record is rendered
+- pointer selection updates child collections without full page reload
+- child page can be opened in parent context and is filtered to that parent
+- child FK is preselected/locked and enforced server-side on create/update

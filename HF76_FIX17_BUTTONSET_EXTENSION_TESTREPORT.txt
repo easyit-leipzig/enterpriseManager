@@ -1,0 +1,27 @@
+HF76-FIX17 – Buttonset-Erweiterung und Projekt-Verknüpfung
+
+Neu in assets/img:
+- rueckgaengig.png
+- wiederholen.png
+- zurueck.png
+- weiter.png
+
+Neu in ButtonRegistry:
+- rueckgaengig
+- wiederholen
+- zurueck
+- weiter
+
+Explizit verknuepfte Projektstellen:
+- installer/local-config.php (Zurueck, Weiter)
+- installer/database.php (Zurueck, Weiter)
+- installer/admin.php (Zurueck, Weiter)
+- health.php (Zurueck, Weiter)
+- app/developer/hooks.php (Zuruecksetzen, Zurueck)
+- app/developer/events.php (Filtern, Zuruecksetzen, Zurueck)
+- app/developer/container.php (Zuruecksetzen, Zurueck)
+- app/security/audit.php (Filtern, Zuruecksetzen)
+- products/dataform/records.php (Suchen, Zuruecksetzen, Zurueck)
+- products/dataform/workflow.php (Zurueck)
+- products/dataform/runtime.php (Aktualisieren)
+- products/dataform/import.php (Zuruecknehmen -> rueckgaengig)

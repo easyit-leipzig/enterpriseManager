@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>DataForm 5 – Gebundene Formulare</title>
+</head>
+<body>
+
+<fieldset>
+    <legend>Gebundenes Formular</legend>
+
+    <label>
+        <input
+            type="checkbox"
+            name="inheritParentValue"
+            checked
+            disabled
+        >
+        Hauptwert automatisch übernehmen
+    </label>
+
+    <input
+        type="hidden"
+        name="inheritParentValue"
+        value="1"
+    >
+
+    <br>
+
+    <label>
+        <input
+            type="checkbox"
+            name="boundFieldReadonly"
+            value="1"
+            checked
+        >
+        Gebundenes Feld schreibgeschützt
+    </label>
+
+    <button
+        type="button"
+        data-help-id="dataform.boundForm"
+        title="Hilfe zu gebundenen Formularen"
+        aria-label="Hilfe zu gebundenen Formularen"
+    >?</button>
+</fieldset>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+$r=__DIR__;
+$i=(string)file_get_contents($r.'/products/dataform/index.php');
+$rt=(string)file_get_contents($r.'/products/dataform/runtime.php');
+$p=(string)file_get_contents($r.'/products/dataform/runtime-proof.php');
+$ht=(string)file_get_contents($r.'/products/dataform/.htaccess');
+$c=[];$f=function($n,$ok)use(&$c){$c[]=['check'=>$n,'status'=>$ok?'PASS':'FAIL'];};
+$f('runtime owns doctype',str_contains($rt,'<!doctype html>'));
+$f('runtime owns HF17 marker',str_contains($rt,'HF36 DATAFORM RUNTIME ACTIVE'));
+$f('runtime owns shell',str_contains($rt,'data-runtime-shell="topbar"')&&str_contains($rt,'data-runtime-shell="main"'));
+$f('runtime sends runtime header',str_contains($rt,'X-EasyIT-DataForm-Runtime: HF36'));
+$f('runtime loads workspace css',str_contains($rt,'products/dataform/assets/workspace.css'));
+$f('compat index redirects to runtime',str_contains($i,'runtime.php')&&str_contains($i,'Location: '));
+$f('apache rewrite bypasses index',str_contains($ht,'RewriteRule ^index\\.php$ runtime.php'));
+$f('runtime proof endpoint exists',is_file($r.'/products/dataform/runtime-proof.php')&&str_contains($p,'HF36 DATAFORM RUNTIME PROOF'));
+$f('workspace css exists',is_file($r.'/products/dataform/assets/workspace.css')&&filesize($r.'/products/dataform/assets/workspace.css')>1000);
+$failed=count(array_filter($c,fn($x)=>$x['status']==='FAIL'));
+echo json_encode(['release'=>'RC1.8','hotfix'=>'HF34','status'=>$failed?'FAIL':'PASS','checks'=>$c,'summary'=>['checks'=>count($c),'failed'=>$failed]],JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).PHP_EOL;
+exit($failed?1:0);

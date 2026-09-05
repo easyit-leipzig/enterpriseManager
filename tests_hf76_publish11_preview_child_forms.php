@@ -1,0 +1,26 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$css=(string)file_get_contents($root.'/products/dataform/assets/workspace.css');
+$checks=[];
+$t=function(string $name,bool $ok)use(&$checks):void{$checks[]=['name'=>$name,'status'=>$ok?'PASS':'FAIL'];};
+$t('preview discovers enabled 1:n child DataForms',str_contains($records,"r.source_dataform_id=?")&&str_contains($records,"r.relation_type='1:n'")&&str_contains($records,'$previewChildRelations[]'));
+$t('preview renders Kindformulare section',str_contains($records,'<h2>Kindformulare</h2>')&&str_contains($records,'data-preview-child-forms-panel'));
+$t('each child is rendered as real iframe runtime',str_contains($records,'data-preview-child-frame')&&str_contains($records,'data-child-dataform-id'));
+$t('child iframe uses actual records runtime',str_contains($records,"new URL('records.php',window.location.href)")&&str_contains($records,"u.searchParams.set('dataform'"));
+$t('child iframe stays in readonly preview mode',str_contains($records,"u.searchParams.set('embed','1')")&&str_contains($records,"u.searchParams.set('preview','1')")&&str_contains($records,"u.searchParams.set('child_preview','1')"));
+$t('child iframe receives parent relation and parent record',str_contains($records,"u.searchParams.set('parent_relation'")&&str_contains($records,"u.searchParams.set('parent_record'"));
+$t('child records are filtered by configured FK',str_contains($records,'$previewParentFilter')&&str_contains($records,"candidate['data'][\$lookupFieldName]")&&str_contains($records,'===(string)$parentRecordContextId'));
+$t('current parent DS change dispatches live event',str_contains($records,"easyit-dataform-current-record")&&str_contains($records,'CustomEvent'));
+$t('parent DS change reloads all child iframes without page reload',str_contains($records,'function loadChildren(parentRecordId)')&&str_contains($records,"frame.setAttribute('src',next)"));
+$t('initial active parent record is used',str_contains($records,'$previewParentRecordId=$recordId>0?$recordId:$activeRecordId'));
+$t('multiple child relations get separate child cards',str_contains($records,'foreach($previewChildRelations as $previewChild)')&&str_contains($records,'data-preview-child-relation'));
+$t('nested child previews are depth limited',str_contains($records,'$previewDepth<3')&&str_contains($records,"u.searchParams.set('preview_depth'"));
+$t('child preview navigation preserves parent context',str_contains($records,"['parent_relation','parent_record','preview_depth','child_preview']"));
+$t('nested iframe height is synchronized',str_contains($records,'easyit-dataform-preview-height')&&str_contains($records,'frame.contentWindow!==ev.source'));
+$t('child preview CSS exists',str_contains($css,'.df-preview-child-forms-panel')&&str_contains($css,'.df-preview-child-frame'));
+$fail=array_filter($checks,fn(array $x):bool=>$x['status']==='FAIL');
+foreach($checks as $x)echo $x['status'].' '.$x['name'].PHP_EOL;
+echo 'RESULT '.(count($checks)-count($fail)).'/'.count($checks).' PASS'.PHP_EOL;
+exit($fail?1:0);

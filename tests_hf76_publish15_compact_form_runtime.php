@@ -1,0 +1,24 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$app=(string)file_get_contents($root.'/system/app/project_runtime/DataFormApp.php');
+$css=(string)file_get_contents($root.'/system/app/project_runtime/assets/app.css');
+$checks=[];
+$c=function(string $name,bool $ok)use(&$checks):void{$checks[$name]=$ok?'PASS':'FAIL';};
+$c('enterprise form nav uses fixed current marker',str_contains($records,'class="df-form-current-marker"')&&str_contains($records,'width:34px!important;height:34px!important'));
+$c('enterprise current record metadata separated from icon',str_contains($records,'class="df-form-current-meta"')&&str_contains($records,'Aktueller Datensatz'));
+$c('enterprise form nav is compact grid',str_contains($records,'.df-form-record-nav{display:grid;grid-template-columns:auto auto minmax(170px,1fr) auto auto auto'));
+$c('enterprise form new record uses DS graphic',str_contains($records,"easyit_button_attributes('neuer_ds')")&&str_contains($records,"easyit_button_image_html('neuer_ds','../../')"));
+$c('enterprise form respects configured field width',str_contains($records,'flex:0 0 min(100%,var(--field-width,100%))'));
+$c('enterprise form has dedicated compact action bar',str_contains($records,'df-runtime-form-actions')&&str_contains($records,"easyit_button_attributes('speichern','record')"));
+$c('export runtime separates current marker and label',str_contains($app,'current-record-marker')&&str_contains($app,'current-record-meta'));
+$c('export runtime form nav includes neuer_ds',str_contains($app,"assets/img/neuer_ds.png"));
+$c('export runtime forwards field width to CSS',str_contains($app,"--field-width:")&&str_contains($app,"\$f['cfg']['width']"));
+$c('export runtime has compact form CSS',str_contains($css,'PUBLISH15 – kompakte echte Formularansicht')&&str_contains($css,'.view-form .form-record-nav{display:grid'));
+$c('export form fields use configured width',str_contains($css,'var(--field-width,100%)'));
+$c('export current icon constrained',str_contains($css,'.current-record-marker img{width:36px!important;height:36px!important'));
+$fail=array_filter($checks,fn($v)=>$v!=='PASS');
+foreach($checks as $n=>$v)echo ($v==='PASS'?'[PASS] ':'[FAIL] ').$n.PHP_EOL;
+echo count($checks).'/'.count($checks).' checks, '.count($fail).' failures'.PHP_EOL;
+exit($fail?1:0);

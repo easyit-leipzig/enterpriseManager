@@ -1,0 +1,7 @@
+HF76-FIX13 current-record state
+
+- DS pointer selection stays client-side; no reload.
+- Selected persistent record is mirrored to URL via history.replaceState.
+- POST forms receive active_record as UI state without changing their record target.
+- New unsaved row remains "new" client state and removes active_record from URL.
+- Initial server-selected record is synchronized through the same client routine.

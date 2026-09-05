@@ -1,0 +1,12 @@
+HF76-PUBLISH2 – Duplicate Button Audit
+======================================
+
+Resultat:
+- Aktionsgruppen mit doppelter Registry-Belegung: 0
+- Aktionsgruppen mit doppeltem Ziel/Formaction: 0
+- Neue semantische Registry-Typen: 13
+- Bestehende Funktionalität entfernt: 0
+
+Geprüfte Hauptbereiche:
+Enterprise Dashboard, Recovery, Setup, Projektverwaltung, Security Audit,
+DataForm Records, DataForm Import, DataForm Packages, DataForm Reports.

@@ -1,0 +1,5 @@
+<?php
+declare(strict_types=1);
+use DataForm5\Documentation\Core\{ComponentCatalog,DocumentationGenerator};
+$root=dirname(__DIR__);$kernel=require $root.'/bootstrap/app.php';$c=$kernel->container();$catalog=$c->get(ComponentCatalog::class);$items=$catalog->scan();assert(count($items)>100);$found=false;foreach($items as $item){if(($item['class']??'')===DocumentationGenerator::class){$found=true;break;}}assert($found===true);
+$target=$root.'/storage/framework/documentation-test';if(is_dir($target)){foreach(glob($target.'/*')?:[] as $f)unlink($f);rmdir($target);} $result=$c->get(DocumentationGenerator::class)->generate($target);assert(($result['build']??'')==='build0026');assert(is_file($target.'/component-catalog.json'));assert(is_file($target.'/component-catalog.md'));assert(is_file($target.'/build-overview.md'));$json=json_decode((string)file_get_contents($target.'/component-catalog.json'),true);assert(($json['summary']['total']??0)>100);foreach(glob($target.'/*')?:[] as $f)unlink($f);rmdir($target);echo "PASS: Documentation, Metadata and Developer Portal Layer\n";

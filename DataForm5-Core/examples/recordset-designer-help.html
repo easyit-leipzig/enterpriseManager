@@ -1,0 +1,30 @@
+<!-- DataForm-/Recordset-Designer: Beispielintegration -->
+
+<link rel="stylesheet" href="/assets/css/dataform-help.css">
+<script src="/assets/js/dataform-help.js"></script>
+
+<!-- Permanentes Hilfefenster -->
+<aside id="dataform-help-panel"></aside>
+
+<script>
+DataFormHelp.configure({
+    apiUrl: "/api/dataform-help.php",
+    documentUrl: "/help.php"
+});
+
+/* Beim Öffnen des Recordset-Designers */
+DataFormHelp.show(
+    "recordset.callbacks",
+    "#dataform-help-panel"
+);
+
+/* Wenn der Benutzer das Feld "Nach Speichern" fokussiert */
+document
+    .querySelector('[name="after_save"]')
+    ?.addEventListener("focus", () => {
+        DataFormHelp.show(
+            "recordset.afterSave",
+            "#dataform-help-panel"
+        );
+    });
+</script>

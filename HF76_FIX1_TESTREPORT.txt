@@ -1,0 +1,36 @@
+easyIT Enterprise RC1.8-FC1-HF76 FIX1 – DataForm Include-Idempotenz
+====================================================================
+
+Fehlerbild
+----------
+Browser-Fatal-Error beim Aufruf von products/dataform/runtime.php:
+Cannot declare class DataFormFieldTypeRegistry, because the name is already in use.
+
+Ursache
+-------
+DataFormManager.php lädt DataFormFieldTypes.php mit require_once. runtime.php,
+records.php und weitere HTTP-Einstiegspunkte verwendeten anschließend teilweise
+normales require für bereits indirekt geladene PHP-Abhängigkeiten.
+
+Korrektur
+---------
+- DataForm-HTTP-Einstiegspunkte konsequent auf require_once umgestellt.
+- runtime.php, records.php und media.php damit gegen die konkrete Doppeldefinition abgesichert.
+- Historische HF38-Kompatibilitätsprüfung bleibt erhalten.
+- Neuer Test tests_dataform_hf76_fix1_include_idempotency.php ergänzt.
+
+Prüfungen vor Release-Neubau
+----------------------------
+- Gesamter PHP-Syntaxcheck: 822 / 822 PASS
+- Bestehende Root-Testskripte inkl. neuem FIX1-Test: 122 / 122 PASS
+- FIX1 Include-Idempotenz: 5 / 5 PASS
+- HF76 Feldtypen: 33 / 33 PASS
+- HF76 Medien-Lifecycle: 21 / 21 PASS
+- HF76 Transport/API/Backend: 30 / 30 PASS
+- HF76 Final-/Portabilitätstest: 31 / 31 PASS
+
+Freigabehinweis
+---------------
+Dieses Paket ist ein vollständiger HF76-Gesamtstand mit integriertem FIX1.
+Es ist kein Overlay. Beim Ersetzen einer bestehenden HF76-Installation muss die
+lokale DataForm5-Core/.env wie bisher erhalten/übernommen werden.

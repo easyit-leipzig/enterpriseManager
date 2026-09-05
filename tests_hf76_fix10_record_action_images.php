@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$registry=(string)file_get_contents($root.'/system/ui/ButtonRegistry.php');
+$js=(string)file_get_contents($root.'/assets/js/easyit-button-registry.js');
+$workspace=(string)file_get_contents($root.'/products/dataform/system/WorkspaceLayout.php');
+$layout=(string)file_get_contents($root.'/system/ui/layout.php');
+$checks=[];
+$checks['server helper exists']=str_contains($registry,'function easyit_button_image_html');
+$checks['save image server-side']=str_contains($records,"easyit_button_image_html('speichern','../../')");
+$checks['show image server-side']=str_contains($records,"easyit_button_image_html('anzeigen','../../')");
+$checks['delete image server-side']=str_contains($records,"easyit_button_image_html('loeschen','../../')");
+$checks['show fixed semantic']=preg_match('/easyit_button_attributes\(\'anzeigen\',\'record\'\).*data-button-fixed="1".*data-crud="show"/s',$records)===1;
+$checks['one row delete button markup']=substr_count($records,'df-record-delete-button')===1;
+$checks['fixed guard js']=str_contains($js,"el.hasAttribute('data-button-fixed')");
+$checks['workspace cachebuster']=str_contains($workspace,'buttonRegistryJsVersion');
+$checks['global cachebuster']=str_contains($layout,'buttonRegistryJsVersion');
+$checks['show image source canonical']=str_contains($registry,"'anzeigen' =>") && str_contains($registry,"'image' => 'assets/img/anzeigen.png'");
+$failed=[];foreach($checks as $n=>$ok){echo ($ok?'PASS ':'FAIL ').$n.PHP_EOL;if(!$ok)$failed[]=$n;}echo count($checks).'/'.count($checks).' PASS; failures='.count($failed).PHP_EOL;exit($failed?1:0);

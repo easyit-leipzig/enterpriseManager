@@ -1,0 +1,22 @@
+<?php
+declare(strict_types=1);
+$r=__DIR__;$checks=[];$c=function(string $n,bool $ok)use(&$checks){$checks[]=['check'=>$n,'status'=>$ok?'PASS':'FAIL'];};
+$u=(string)file_get_contents($r.'/app/security/users.php');
+$roles=(string)file_get_contents($r.'/app/security/roles.php');
+$l=(string)file_get_contents($r.'/system/ui/layout.php');
+$d=(string)file_get_contents($r.'/app/dashboard.php');
+$c('users CRUD page exists',is_file($r.'/app/security/users.php'));
+$c('roles CRUD page exists',is_file($r.'/app/security/roles.php'));
+$c('permissions.manage guards users',str_contains($u,"enterprise_require_capability(\$user,'permissions.manage')"));
+$c('permissions.manage guards roles',str_contains($roles,"enterprise_require_capability(\$user,'permissions.manage')"));
+$c('passwords use password_hash',str_contains($u,'password_hash($password,PASSWORD_DEFAULT)'));
+$c('CSRF users',str_contains($u,'enterprise_check_csrf'));
+$c('CSRF roles',str_contains($roles,'enterprise_check_csrf'));
+$c('last active admin protected',str_contains($u,'Der letzte aktive Administrator'));
+$c('admin role protected',str_contains($roles,'Systemrolle admin darf nicht gelöscht'));
+$c('audit user changes',str_contains($u,'security.user.'));
+$c('audit role changes',str_contains($roles,'security.role.'));
+$c('global security navigation',str_contains($l,"'security' => ['Benutzer & Rechte'"));
+$c('dashboard security entry',str_contains($d,'security/users.php'));
+$f=count(array_filter($checks,fn($x)=>$x['status']!=='PASS'));
+echo json_encode(['release'=>'RC1.8','hotfix'=>'HF9','status'=>$f?'FAIL':'PASS','checks'=>$checks,'summary'=>['checks'=>count($checks),'failed'=>$f]],JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE).PHP_EOL;exit($f?1:0);

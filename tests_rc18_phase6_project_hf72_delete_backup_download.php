@@ -1,0 +1,26 @@
+<?php
+declare(strict_types=1);
+$r=__DIR__;
+$checks=[];
+$c=function(string $n,bool $ok)use(&$checks){$checks[]=['check'=>$n,'status'=>$ok?'PASS':'FAIL'];};
+$del=(string)file_get_contents($r.'/app/projects/delete.php');
+$idx=(string)file_get_contents($r.'/app/projects/index.php');
+$helper=(string)file_get_contents($r.'/system/app/project_backup.php');
+$download=(string)file_get_contents($r.'/app/projects/backup-download.php');
+$c('delete dialog exposes project backup choice',str_contains($del,'name="create_backup"')&&str_contains($del,'Projekt vor dem Löschen als Download sichern'));
+$c('backup is selected by default on first open',str_contains($del,": true;")&&str_contains($del,"\$backupRequested = \$_SERVER['REQUEST_METHOD'] === 'POST'"));
+$c('backup is created before destructive transaction',strpos($del,'enterprise_project_backup_create')<strpos($del,'$pdo->beginTransaction()')&&strpos($del,'enterprise_project_backup_create')<strpos($del,'DROP DATABASE'));
+$c('backup failure blocks deletion',strpos($del,'enterprise_project_backup_create')<strpos($del,'DELETE FROM projects WHERE id = ?')&&str_contains($helper,'Eine vollständige Sicherung kann deshalb nicht erstellt werden; es wurde nichts gelöscht.'));
+$c('backup contains project metadata and SQL dump',str_contains($helper,"project.json")&&str_contains($helper,"database.sql")&&str_contains($helper,"README_RESTORE.txt")&&str_contains($helper,"manifest.json"));
+$c('database dump uses a consistent snapshot',str_contains($helper,'START TRANSACTION WITH CONSISTENT SNAPSHOT')&&str_contains($helper,"SET FOREIGN_KEY_CHECKS=0"));
+$c('archive integrity is sha256 checked',str_contains($helper,"hash_file('sha256', \$path)")&&str_contains($del,"'backup_sha256'"));
+$c('download link is random session protected and expires',str_contains($helper,'bin2hex(random_bytes(24))')&&str_contains($helper,"\$_SESSION['project_backup_downloads']")&&str_contains($helper,'time() + 86400'));
+$c('download resolver enforces backup root containment',str_contains($helper,'realpath(enterprise_project_backup_ensure_root())')&&str_contains($helper,'str_starts_with($path, $root . DIRECTORY_SEPARATOR)'));
+$c('download endpoint requires authentication',str_contains($download,"enterprise_require_auth('../../')")&&str_contains($download,'enterprise_project_backup_resolve_download'));
+$c('successful delete exposes backup download in project list',str_contains($idx,'backup-download.php?token=')&&str_contains($idx,'Projektsicherung herunterladen'));
+$c('delete page exposes backup link when later deletion step fails',str_contains($del,'Sicherung herunterladen')&&str_contains($del,'Die Sicherungsdatei bleibt als Download verfügbar'));
+$c('audit distinguishes backup request and creation',str_contains($del,"'backup_requested'")&&str_contains($del,"'backup_created'")&&str_contains($del,"'project.backup'"));
+$c('optional database deletion remains independent',str_contains($del,'name="delete_database"')&&str_contains($del,'Projektdatenbank ebenfalls endgültig löschen'));
+$f=count(array_filter($checks,fn($x)=>$x['status']!=='PASS'));
+echo json_encode(['release'=>'RC1.8','hotfix'=>'HF72','status'=>$f?'FAIL':'PASS','checks'=>$checks,'summary'=>['checks'=>count($checks),'failed'=>$f]],JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE).PHP_EOL;
+exit($f?1:0);

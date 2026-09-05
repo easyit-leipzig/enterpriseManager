@@ -1,0 +1,25 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$ctx=(string)file_get_contents($root.'/products/dataform/system/DataFormActionContext.php');
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$runtime=(string)file_get_contents($root.'/products/dataform/runtime.php');
+$events=(string)file_get_contents($root.'/products/dataform/assets/dataform-events.js');
+$app=(string)file_get_contents($root.'/system/app/project_runtime/DataFormApp.php');
+$appjs=(string)file_get_contents($root.'/system/app/project_runtime/assets/app.js');
+$checks=[];$c=function(string $n,bool $ok)use(&$checks):void{$checks[$n]=$ok?'PASS':'FAIL';};
+$c('canonical schema and version',str_contains($ctx,"easyit.dataform.action-context")&&str_contains($ctx,"VERSION = '1.0'"));
+$c('canonical named object',str_contains($ctx,"OBJECT_NAME = 'dataformContext'"));
+$c('after-save record values',str_contains($ctx,"'values' => \$values")&&str_contains($ctx,"'original_values' => \$originalValues"));
+$c('after-save changes and dirty fields',str_contains($ctx,"'changes' => \$changes")&&str_contains($ctx,"'dirty_fields' => \$dirtyFields"));
+$c('after-save result contains operation and record id',str_contains($ctx,"'operation' => \$operation")&&str_contains($ctx,"'record_id' => \$recordId"));
+$c('enterprise builds context only after successful save',str_contains($records,'DataFormActionContext::afterSave')&&str_contains($records,'$saveOperation'));
+$c('enterprise emits handlers and action context JSON',str_contains($records,'id="df-event-handlers"')&&str_contains($records,'id="df-action-context"'));
+$c('enterprise JS exposes named dataformContext',str_contains($events,"new Function('dataformContext','detail','event'")&&str_contains($events,'window.dataformContext=base'));
+$c('enterprise after_save receives server snapshot',str_contains($events,"serverContext?.action?.name==='save'")&&str_contains($events,"run('after_save',clone(serverContext))"));
+$c('settings UI documents requested callback',str_contains($runtime,'afterSave(dataformContext);')&&str_contains($runtime,'record.original_values')&&str_contains($runtime,'record.changes'));
+$c('export runtime creates compatible action context',str_contains($app,'df_action_context_after_save')&&str_contains($app,"'schema'=>'easyit.dataform.action-context'")&&str_contains($app,"'object_name'=>'dataformContext'"));
+$c('export runtime transports action context',str_contains($app,"'action_context'=>\$actionContext"));
+$c('export JS calls after_save with named context',str_contains($appjs,"new Function('dataformContext','detail','event'")&&str_contains($appjs,"run('after_save',clone(settings.action_context))"));
+$c('legacy detail alias remains compatible',str_contains($events,"'dataformContext','detail','event'")&&str_contains($appjs,"'dataformContext','detail','event'"));
+$fail=array_filter($checks,fn($v)=>$v!=='PASS');foreach($checks as $n=>$st)echo ($st==='PASS'?'[PASS] ':'[FAIL] ').$n.PHP_EOL;echo count($checks).'/'.count($checks).' checks, '.count($fail).' failures'.PHP_EOL;exit($fail?1:0);

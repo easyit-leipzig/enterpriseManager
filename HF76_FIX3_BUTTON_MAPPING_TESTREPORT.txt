@@ -1,0 +1,19 @@
+easyIT Enterprise RC1.8-FC1-HF76-FIX3
+DataForm Button Mapping Test Report
+
+Requested corrections:
+- DataForm "Öffnen" -> formular.png
+- Datensätze action -> normaler_ds.png, image-only
+
+Results:
+- Targeted mapping test: 8/8 PASS
+- Root regression suite: 124/124 PASS
+- PHP syntax: 825/825 PASS
+- JavaScript syntax: 4/4 PASS
+
+Implementation:
+- products/dataform/runtime.php now loads assets/js/easyit-button-registry.js
+- explicit data-button="formular" for opening a DataForm
+- explicit data-button="normaler_ds" for opening record data
+- explicit data-button="loeschen" for delete
+- explicit data-button="neu" for new DataForm

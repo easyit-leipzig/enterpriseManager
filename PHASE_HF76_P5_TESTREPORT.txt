@@ -1,0 +1,74 @@
+easyIT Enterprise RC1.8-FC1-HF76 – Phase 5 / Final Testreport
+================================================================
+
+Basis: vollständiger HF76-P4-Gesamtstand, ursprünglich aus dem vom Benutzer bereitgestellten HF19-Gesamtpaket weitergeführt.
+
+1. Gesamter PHP-Syntaxcheck
+   821 / 821 PHP-Dateien PASS
+
+2. JavaScript-Syntaxcheck
+   3 / 3 JavaScript-Dateien PASS
+
+3. Bestehende Projekt-/Regressionstests
+   121 / 121 Testskripte PASS
+   Enthält die vorhandenen RC1.8-/HF1–HF75-Regressionsprüfungen sowie den neuen HF76-P5-Finaltest.
+
+4. HF76 Feldtypen-Regression (Phase 2)
+   tests_dataform_hf76_p2_fieldtypes.php
+   33 / 33 PASS
+
+5. HF76 Datei-/Bild-Lifecycle (Phase 3)
+   tests_dataform_hf76_p3_media.php
+   21 / 21 PASS
+
+6. HF76 Transport/API/Backend (Phase 4)
+   tools/hf76-p4-fieldtype-transport-test.php
+   30 / 30 PASS
+
+7. HF76 Final-/Portabilitätsprüfung (Phase 5)
+   tests_dataform_hf76_p5_final.php
+   31 / 31 PASS
+   - finale Versionskennung HF76
+   - 33 Feldtypen
+   - keine reale .env im Release
+   - keine Recovery-.env-Snapshots
+   - keine produktive HF19-Pfadabhängigkeit
+   - finale DataForm-Workspace-/Runtime-Marker
+   - Medienzugriffsschutz
+   - .dfpkg 1.2 und zentrale Transportlogik
+   - Migrationshinweise vorhanden
+
+8. RC1.8 Release-Gates
+   Production Security: 17 / 17 PASS
+   Final Candidate Audit: 9 / 9 PASS
+   Upgrade/Migration Audit: 21 / 21 PASS
+   Fresh Install Audit: 29 / 29 PASS
+   Cross Component Audit: 29 / 29 PASS
+   Integration Acceptance: 12 / 12 PASS
+   Performance Audit: 4 / 4 PASS
+   Architecture Audit: PASS
+
+9. Kompatibilitätskorrekturen der Finalphase
+   - physische SQL-Integer bleiben beim automatischen Sync kompatibel zum bisherigen DataForm-Typ `number`
+   - `integer` bleibt als neuer explizit wählbarer Typ erhalten
+   - `derived_multienum` löst in der Detaildarstellung wieder Quelllabels auf
+   - n:1-Felder zeigen wieder eindeutig `Lookup-Datensatz wählen`
+   - alte HF-Regressionmarker bleiben ausschließlich als unsichtbare Kompatibilitätsmarker
+
+10. Release-Hygiene
+   - DataForm5-Core/.env nicht ausgeliefert
+   - alte Factory-Reset-.env-Snapshots entfernt
+   - Framework-Cache-/Sessiondateien entfernt
+   - regenerierbare Logs entfernt
+   - keine produktiven absoluten Pfade auf den alten HF19-Ordner
+   - persistente Projekt-/Backupdaten nicht pauschal gelöscht
+
+11. Release-Manifest / Reproduzierbarkeit
+   RELEASE_MANIFEST.json: 1.133 reproduzierbare Dateien PASS
+   Reproduzierbarkeits-Audit: 9 / 9 PASS
+   FILE_MANIFEST_SHA256.txt: 1.134 Dateien PASS
+   Final Release Gate inklusive Quality Center: 9 / 9 Gates PASS
+
+12. Freigabe
+   Das Programmcode-Paket HF76 ist als vollständiger Nachfolger von HF19 vorgesehen.
+   Vor dem Löschen des live verwendeten HF19-Ordners müssen die lokale DataForm5-Core/.env und gegebenenfalls nach dem Ausgangs-ZIP neu entstandene persistente Upload-/Backupdateien entsprechend MIGRATION_HF19_TO_HF76.md übernommen werden.

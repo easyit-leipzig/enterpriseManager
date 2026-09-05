@@ -1,0 +1,15 @@
+HF76-FIX12 - Datensatzzeiger ohne Seitenreload
+
+Funktion:
+- Klick auf einen bestehenden DS-Zeiger navigiert nicht mehr.
+- Bisher aktueller Datensatz -> normaler_ds.png.
+- Angeclickter Datensatz -> aktueller_ds.png.
+- Auswahlzustand wird clientseitig als data-current-record und window.EasyITDataFormCurrentRecord geführt.
+- Neuer, noch nicht gespeicherter Datensatz kann aktuell behandelt werden und behaelt neuer_ds.png.
+- Fokus in einer Tabellenzeile setzt dieselbe Zeile ebenfalls ohne Reload aktuell.
+
+Tests:
+- FIX12 Spezialtest: 10/10 PASS
+- Root-Regressionssuite: 132/132 PASS
+- PHP-Syntax: 833/833 PASS
+- JavaScript-Syntax: 3/3 PASS

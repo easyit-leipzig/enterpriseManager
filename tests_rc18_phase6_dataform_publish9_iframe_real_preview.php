@@ -1,0 +1,21 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$runtime=(string)file_get_contents($root.'/products/dataform/runtime.php');
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$css=(string)file_get_contents($root.'/products/dataform/assets/workspace.css');
+$c=[];$t=function(string $n,bool $ok)use(&$c){$c[]=['name'=>$n,'status'=>$ok?'PASS':'FAIL'];};
+$t('editor has Realvorschau section',str_contains($runtime,'<h3>Realvorschau</h3>'));
+$t('editor embeds actual records runtime',str_contains($runtime,'records.php?project=')&&str_contains($runtime,'embed=1&amp;preview=1'));
+$t('preview refresh control exists',str_contains($runtime,'data-preview-refresh'));
+$t('full runtime open action exists',str_contains($runtime,'Runtime öffnen'));
+$t('records supports embed mode',str_contains($records,'$embedMode ='));
+$t('records supports preview mode',str_contains($records,'$previewMode ='));
+$t('preview POST writes are blocked',str_contains($records,"REQUEST_METHOD'] === 'POST' && \$previewMode"));
+$t('preview produces minimal iframe HTML',str_contains($records,'dataform-iframe-preview'));
+$t('preview keeps GET navigation embedded',str_contains($records,"searchParams.set('embed','1')"));
+$t('preview reports dynamic height',str_contains($records,'easyit-dataform-preview-height'));
+$t('parent listens for iframe height',str_contains($runtime,'easyit-dataform-preview-height'));
+$t('workspace contains iframe styling',str_contains($css,'.df-real-preview-frame'));
+foreach($c as $x)echo $x['status'].' '.$x['name'].PHP_EOL;
+$f=array_filter($c,fn($x)=>$x['status']==='FAIL');echo 'RESULT '.(count($c)-count($f)).'/'.count($c).' PASS'.PHP_EOL;exit($f?1:0);

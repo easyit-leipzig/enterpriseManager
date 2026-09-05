@@ -1,0 +1,12 @@
+HF76-FIX15 – Neue-Datensatz-Aktion ohne Reload auf letzter Seite
+
+- Inline-Neuzeile bleibt ausschließlich auf der letzten Seite.
+- Toolbar „Neuer Datensatz“ und Subnavigation „Neu“ wählen bei sichtbarer Neuzeile clientseitig den neuen DS.
+- Kein Reload, kein Submit; erstes Eingabefeld wird fokussiert.
+- Von früheren Seiten bleibt der Seitenwechsel zur letzten Seite erhalten.
+
+Abschlussprüfung:
+- FIX15-Spezialtest: 10/10 PASS
+- vollständige Root-Regressionssuite: 135/135 PASS
+- PHP-Syntax: 836/836 PASS
+- JavaScript-Syntax: 4/4 PASS

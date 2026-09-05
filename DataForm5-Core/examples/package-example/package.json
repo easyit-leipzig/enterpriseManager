@@ -1,0 +1,8 @@
+{
+  "name": "easyit-example",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Minimales Beispielpaket für DataForm5-Core.",
+  "dependencies": {},
+  "checksums": {}
+}

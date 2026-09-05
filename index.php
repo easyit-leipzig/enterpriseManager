@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/system/app/bootstrap.php';
+if (enterprise_user()) { header('Location: app/dashboard.php'); exit; }
+require __DIR__.'/system/ui/layout.php';
+$installed=false; try{$pdo=enterprise_pdo();enterprise_upgrade($pdo);$installed=(int)$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn()>0;}catch(Throwable $e){}
+ob_start(); ?>
+<section class="hero"><span class="badge">Single Point of Entry · RC1.1.2-dev</span><h1>easyIT Enterprise</h1><p>Gemeinsamer Einstiegspunkt für Installation und die zentrale Verwaltung aller easyIT-Produkte.</p><div class="actions"><?php if($installed):?><a class="button" href="login.php">Zum Enterprise-Login</a><a class="button secondary" <?= easyit_button_attributes('hilfe') ?> href="setup.php">Setup-Tutorial</a><?php else:?><a class="button" <?= easyit_button_attributes('start') ?> href="setup.php">Setup-Tutorial starten</a><a class="button secondary" href="health.php">System prüfen</a><?php endif;?><a class="button secondary" href="recovery.php">Recovery / Reset</a></div></section>
+<div class="cards"><a class="card" href="login.php"><h2>Enterprise-Dashboard</h2><p>Projekte, Produkte und Benutzer zentral verwalten.</p></a><a class="card" href="setup.php"><h2>Installation und Setup</h2><p>Lokale Installation prüfen oder nachvollziehen.</p></a><a class="card" href="health.php"><h2>Systemprüfung</h2><p>PHP, Erweiterungen und Schreibrechte kontrollieren.</p></a><a class="card" href="documentation.php"><h2>Dokumentation</h2><p>Architektur und Entwicklungsregeln öffnen.</p></a><a class="card" href="recovery.php"><h2>Recovery / Ursprungszustand</h2><p>Bei beschädigter Konfiguration oder Datenbank den Installationszustand kontrolliert zurücksetzen.</p></a></div>
+<?php $content=ob_get_clean();render_page(['title'=>'Start','active'=>'home','content'=>$content,'help'=>['title'=>'Enterprise-Startseite','short'=>'Zentraler Einstieg in Installation und Anwendung.','goal'=>'Nach abgeschlossener Installation am Dashboard anmelden.','next'=>$installed?'Enterprise-Login öffnen.':'Setup abschließen.','tips'=>['Nach erfolgreicher Abnahme beginnt die Arbeit im Enterprise-Dashboard.']]]);

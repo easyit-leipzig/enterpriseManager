@@ -1,0 +1,22 @@
+easyIT Enterprise RC1.8 FC1 HF76 - Phase 1
+===========================================
+Basis: vollständiger HF19-Gesamtstand.
+
+Umgesetzt in Phase 1:
+- zentrale DataForm-Feldtyp-Registry
+- 33 registrierte DataForm-Feldtypen
+- gruppierte Typauswahl im Designer
+- typspezifische Designer-Einstellungen
+- Normalisierung der Feldtyp-Konfiguration
+- SQL-Typ-Mapping für MySQL/MariaDB, SQLite, Oracle und CSV
+- physische Spaltenerzeugung für neu im Designer angelegte Felder bei systemgebundenen Tabellen
+- Rückbau nur für von DataForm selbst verwaltete Feldspalten
+- bestehender derived_multienum bleibt kompatibel
+
+Noch nicht Bestandteil dieser Phase:
+- vollständige CRUD-Renderer/Validatoren der neuen Typen
+- Datei-/Bild-Inhaltsspeicherung
+- Medien-Endpunkt
+- vollständiger Import/Export/API-Abschluss
+
+Die folgenden Funktionen werden in Phase 2 ff. integriert.

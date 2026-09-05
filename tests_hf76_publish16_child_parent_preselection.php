@@ -1,0 +1,24 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$app=(string)file_get_contents($root.'/system/app/project_runtime/DataFormApp.php');
+$css=(string)file_get_contents($root.'/system/app/project_runtime/assets/app.css');
+$checks=[];
+$c=function(string $name,bool $ok)use(&$checks):void{$checks[$name]=$ok?'PASS':'FAIL';};
+$c('enterprise parent context applies beyond create mode',str_contains($records,'PUBLISH16: Sobald ein Kind-DataForm mit einem konkreten Elternkontext')&&!str_contains($records,"\$mode==='create'\n        && \$parentRelationContextId>0"));
+$c('enterprise parent relation validated against child dataform',str_contains($records,'target_dataform_id=?')&&str_contains($records,'Die angeforderte Elternbeziehung gehört nicht zu diesem Kind-DataForm.'));
+$c('enterprise child list filtered by parent context',str_contains($records,'PUBLISH16: Jeder echte Elternkontext filtert das Kind-DataForm')&&str_contains($records,'===(string)$parentRecordContextId'));
+$c('enterprise coupled field is visible select',str_contains($records,'class="df-master-preselected"')&&str_contains($records,'gekoppelter Eltern-Datensatz'));
+$c('enterprise coupled field preselects current parent',str_contains($records,"(int)\$parentOption['id']===(int)\$masterContext['parent_record_id']?'selected':''"));
+$c('enterprise coupled field remains submitted while select is locked',str_contains($records,'type="hidden" name="values[<?= e($name) ?>]"')&&str_contains($records,'df-master-preselected')&&str_contains($records,' disabled>'));
+$c('enterprise parent FK enforced on create and edit',str_contains($records,'PUBLISH16: Ein Kinddatensatz, der im Kontext eines Elternsatzes')&&str_contains($records,'if ($masterContext!==null) {'));
+$c('export runtime resolves parent display caption',str_contains($app,'target_display_field_id')&&str_contains($app,"'parent_caption'=>\$caption"));
+$c('export child form shows selected coupled property',str_contains($app,'class="parent-preselected"')&&str_contains($app,' selected>'));
+$c('export coupled select is locked with hidden FK',str_contains($app,'type="hidden" name="')&&str_contains($app,'class="parent-preselected" disabled aria-label')&&str_contains($app,"parent_record_id"));
+$c('export create and update enforce parent FK',substr_count($app,"\$data[(string)\$parentContext['lookup_field_name']]=(string)\$parentContext['parent_record_id']")>=2);
+$c('export preselection has dedicated styling',str_contains($css,'PUBLISH16 – gekoppelte Eltern-Eigenschaft')&&str_contains($css,'.parent-preselected{'));
+$fail=array_filter($checks,fn($v)=>$v!=='PASS');
+foreach($checks as $name=>$status)echo ($status==='PASS'?'[PASS] ':'[FAIL] ').$name.PHP_EOL;
+echo count($checks).'/'.count($checks).' checks, '.count($fail).' failures'.PHP_EOL;
+exit($fail?1:0);

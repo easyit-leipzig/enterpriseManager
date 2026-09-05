@@ -1,0 +1,8 @@
+.env
+DataForm5-Core/.env
+storage/logs/*
+storage/cache/*
+workspace/temp/*
+workspace/build/*
+packages/*.zip
+!.gitkeep

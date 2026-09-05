@@ -1,0 +1,24 @@
+HF76-PUBLISH15 – COMPACT FORM RUNTIME TEST REPORT
+================================================
+
+Spezialtest kompakte Formularansicht: 12/12 PASS
+PUBLISH13 View-Modes:                 16/16 PASS
+PUBLISH14 Preview-Sync:               11/11 PASS
+iframe-Realvorschau:                  12/12 PASS
+Kindformular-Realvorschau:            15/15 PASS
+Eltern-/Kind-Runtime:                 12/12 PASS
+Strikte DS-Button-Semantik:           20/20 PASS
+Gesamte tests_*.php-Suite:            150/150 PASS
+PHP-Syntaxprüfung:                    859/859 PASS
+JavaScript-Syntaxprüfung:             5/5 PASS
+
+Geprüfte PUBLISH15-Kernpunkte
+-----------------------------
+- aktueller_ds ist auf 34 px begrenzt und kann nicht mehr auf 128 px anwachsen.
+- aktuelle Datensatznummer ist vom Bild getrennt.
+- Formularnavigation ist ein kompaktes Grid.
+- Neuer Datensatz in der DS-Navigation verwendet neuer_ds.png.
+- Feldbreiten aus der DataForm-Konfiguration werden im Formular berücksichtigt.
+- Exportierte HTML5-Runtime übernimmt dieselbe Formularstruktur.
+Final Release Gate:                   9/9 PASS
+Release-Dateimanifest:                1297 Dateien

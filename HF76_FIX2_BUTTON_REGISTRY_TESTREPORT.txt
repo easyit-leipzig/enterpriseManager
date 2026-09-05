@@ -1,0 +1,23 @@
+easyIT Enterprise RC1.8-FC1-HF76 - FIX2 Button Registry
+========================================================
+
+Scope
+-----
+- Complete supplied dbfrontend button set registered
+- 52 individual PNG buttons copied directly to assets/img/
+- Central PHP registry: system/ui/ButtonRegistry.php
+- Central browser registry/legacy adapter: assets/js/easyit-button-registry.js
+- Global image-only button skin: assets/css/easyit-crud-3d-buttons.css
+- No coloured/gradient action-button backgrounds in effective final CSS layer
+- DataForm record pointers mapped to normaler_ds / aktueller_ds / neuer_ds
+- First/last record navigation mapped to erster_ds / letzter_ds
+- Existing data-crud and legacy action markup remains compatible
+
+Validation
+----------
+- Root regression scripts: 123/123 PASS
+- PHP syntax: 824/824 PASS
+- JavaScript syntax: 3/3 PASS
+- Button registry: 52/52 images present and registered
+- Release gates: 9/9 PASS
+- Reproducibility audit: 9/9 PASS before packaging

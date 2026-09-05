@@ -1,0 +1,26 @@
+<?php
+declare(strict_types=1);
+$r=__DIR__;
+$checks=[];
+$c=function(string $n,bool $ok)use(&$checks){$checks[]=['check'=>$n,'status'=>$ok?'PASS':'FAIL'];};
+$idx=(string)file_get_contents($r.'/app/projects/index.php');
+$edit=(string)file_get_contents($r.'/app/projects/edit.php');
+$del=(string)file_get_contents($r.'/app/projects/delete.php');
+$view=(string)file_get_contents($r.'/app/projects/view.php');
+$c('project index exposes CRUD action column',str_contains($idx,'Aktionen')&&str_contains($idx,'data-crud="read"')&&str_contains($idx,'data-crud="edit"')&&str_contains($idx,'data-crud="delete"'));
+$c('create stays available',str_contains($idx,'Neues Projekt anlegen')&&str_contains($idx,'data-crud="create"'));
+$c('edit page exists',is_file($r.'/app/projects/edit.php'));
+$c('edit validates csrf',str_contains($edit,'enterprise_check_csrf'));
+$c('edit validates unique slug',str_contains($edit,'slug = ? AND id <> ?'));
+$c('edit persists project metadata',str_contains($edit,'UPDATE projects SET name = ?, slug = ?, status = ?, description = ?'));
+$c('edit audited and evented',str_contains($edit,"'project.update'")&&str_contains($edit,"'project.updated'"));
+$c('delete page exists',is_file($r.'/app/projects/delete.php'));
+$c('delete requires exact project name confirmation',str_contains($del,'hash_equals')&&str_contains($del,'confirm_name'));
+$c('delete uses csrf',str_contains($del,'enterprise_check_csrf'));
+$c('delete removes registry row',str_contains($del,'DELETE FROM projects WHERE id = ?'));
+$c('delete explicitly preserves project database',str_contains($del,"'database_deleted' => false")&&str_contains($del,'Datenbank bleibt'));
+$c('delete audited and evented',str_contains($del,"'project.delete'")&&str_contains($del,"'project.deleted'"));
+$c('project detail exposes edit and delete',str_contains($view,'edit.php?id=')&&str_contains($view,'delete.php?id='));
+$f=count(array_filter($checks,fn($x)=>$x['status']!=='PASS'));
+echo json_encode(['release'=>'RC1.8','hotfix'=>'HF70','status'=>$f?'FAIL':'PASS','checks'=>$checks,'summary'=>['checks'=>count($checks),'failed'=>$f]],JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE).PHP_EOL;
+exit($f?1:0);

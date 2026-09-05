@@ -1,0 +1,17 @@
+HF76-FIX14 pagination and record navigation
+
+Implemented:
+- 1. DS and Letzter DS are always visible for every non-empty result set, including a single-page result.
+- Page number window is current page +/- 2 with ellipses for omitted ranges.
+- 1. DS / Letzter DS use the central ButtonRegistry and the supplied buttonset images.
+- If the first/last record is already visible on the current page, the jump changes the current record client-side without reload.
+- If the target is on another page, only the required page navigation reload occurs.
+- Page numbers are transparent text navigation, not colored action buttons.
+- Current page status is displayed as Seite X von Y.
+
+Validation:
+- FIX14 targeted test: 12/12 PASS
+- Full root regression: 134/134 PASS
+- PHP syntax: 835/835 PASS
+- JavaScript syntax: 3/3 PASS
+- Reproducibility audit: PASS

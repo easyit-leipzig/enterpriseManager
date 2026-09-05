@@ -1,0 +1,25 @@
+<?php
+declare(strict_types=1);
+$root=__DIR__;
+$records=(string)file_get_contents($root.'/products/dataform/records.php');
+$relations=(string)file_get_contents($root.'/products/dataform/relations.php');
+$manager=(string)file_get_contents($root.'/products/dataform/system/RelationManager.php');
+$context=(string)file_get_contents($root.'/products/dataform/system/DataFormActionContext.php');
+$app=(string)file_get_contents($root.'/system/app/project_runtime/DataFormApp.php');
+$checks=[];
+$c=function(string $name,bool $ok)use(&$checks):void{$checks[$name]=$ok?'PASS':'FAIL';};
+$c('inline renderer receives master context',str_contains($records,"'df-inline-create-control',\$masterContext")&&str_contains($records,"df-inline-edit-control',\$masterContext"));
+$c('inline master field uses concrete parent id',str_contains($records,'PUBLISH18: In einem echten Elternkontext')&&str_contains($records,"\$caption='#'.\$parentId")&&str_contains($records,'data-bound-parent-id'));
+$c('readonly relationship defaults true',str_contains($manager,'bool $boundFieldReadonly=true')&&str_contains($manager,"'bound_field_readonly'=>\$boundFieldReadonly"));
+$c('designer exposes readonly option',str_contains($relations,'name="bound_field_readonly"')&&str_contains($relations,'Gebundenes Fremdschlüsselfeld schreibgeschützt'));
+$c('runtime loads relation config',str_contains($records,'r.lookup_field_id,r.configuration_json')&&str_contains($records,"'bound_field_readonly'=>!array_key_exists"));
+$c('server enforcement respects readonly switch',str_contains($records,"array_key_exists('bound_field_readonly',\$masterContext)"));
+$c('pagination row is before new row',strpos($records,'class="df-record-pagination-row"')!==false&&strpos($records,'class="df-record-pagination-row"')<strpos($records,'class="df-record-new-row"'));
+$c('old post-table pagination removed',substr_count($records,'<nav class="pagination df-pagination-compact"')===1);
+$c('action context exposes binding state',str_contains($context,"'binding' => [")&&str_contains($context,"'readonly' => !array_key_exists('bound_field_readonly',\$parentContext)"));
+$c('export runtime handles readonly config',str_contains($app,'bound_field_readonly')&&str_contains($app,"Eltern-ID '.\$parentId"));
+$c('export pagination row before new row',strpos($app,'record-pagination-row')!==false&&strpos($app,'record-pagination-row')<strpos($app,'id="new-record"'));
+$fail=array_filter($checks,fn($v)=>$v!=='PASS');
+foreach($checks as $name=>$status)echo ($status==='PASS'?'[PASS] ':'[FAIL] ').$name.PHP_EOL;
+echo count($checks).'/'.count($checks).' checks, '.count($fail).' failures'.PHP_EOL;
+exit($fail?1:0);

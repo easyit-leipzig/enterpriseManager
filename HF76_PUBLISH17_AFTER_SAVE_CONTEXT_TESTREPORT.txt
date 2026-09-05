@@ -1,0 +1,20 @@
+HF76-PUBLISH17 – AFTER SAVE / DATAFORMACTIONCONTEXT TESTREPORT
+
+Spezialtest: 14/14 PASS
+Gesamte Testsuite: 152/152 PASS
+PHP-Lint: 862/862 PASS
+JavaScript-Syntax: 6/6 PASS
+Reproduzierbarkeit: PASS
+Final Release Gate: PASS
+
+Verifiziert:
+- dataformContext Schema 1.0
+- benanntes Objekt dataformContext
+- record.values nach erfolgreichem Save
+- original_values / changes / dirty_fields
+- result.operation / record_id
+- Eltern-/Relationskontext
+- Enterprise-Runtime erzeugt serverseitigen After-Save-Snapshot
+- Export-Runtime erzeugt kompatiblen Snapshot
+- Event-Feld akzeptiert afterSave(dataformContext);
+- legacy detail bleibt Alias

@@ -1,0 +1,32 @@
+easyIT Enterprise RC1.8-FC1-HF76-FIX4
+Central Button Titles Test Report
+
+Requirement:
+- Every registered image button has one meaningful central title.
+- title and aria-label are generated from system/ui/ButtonRegistry.php.
+- Local tooltip strings cannot override the central registry.
+- Context-specific meanings reuse the same image through central context titles.
+
+Results:
+- Central title regression: 24/24 PASS
+- Complete root regression suite: 125/125 PASS
+- PHP syntax: 826/826 PASS
+- JavaScript syntax: 4/4 PASS
+- Final release gates: 9/9 PASS
+- Reproducibility audit: 9/9 PASS
+
+Key mappings:
+- formular + dataform -> DataForm öffnen
+- normaler_ds + dataform_records -> Datensätze öffnen
+- normaler_ds -> Datensatz auswählen
+- neu + dataform -> Neues DataForm anlegen
+- neu + record -> Neuen Datensatz anlegen
+- speichern + record -> Datensatz speichern
+- loeschen + dataform -> DataForm löschen
+- loeschen + record -> Datensatz löschen
+
+Architecture:
+- PHP source of truth: system/ui/ButtonRegistry.php
+- Client payload: generated server-side by easyit_button_registry_data_tag()
+- Browser adapter: assets/js/easyit-button-registry.js
+- No duplicated registry title JSON remains in JavaScript.

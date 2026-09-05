@@ -1,0 +1,24 @@
+easyIT Enterprise RC1.8-FC1-HF76 – PUBLISH16
+Kindformular / Elternkopplung – Testreport
+
+Spezialtest: tests_hf76_publish16_child_parent_preselection.php
+Ergebnis: 12/12 PASS
+
+Geprüft:
+- Elternkontext gilt nicht mehr nur für create.
+- Relation wird gegen das konkrete Kind-DataForm validiert.
+- Kinddatensätze werden im Elternkontext auf die aktuelle Eltern-ID gefiltert.
+- Gekoppeltes FK-/Lookup-Feld ist im Kindformular sichtbar.
+- Aktueller Eltern-Datensatz ist im Feld vorausgewählt.
+- Auswahl ist gesperrt; Hidden-Wert wird übertragen.
+- FK wird serverseitig bei Neuanlage und Bearbeitung erzwungen.
+- Export-Runtime ermittelt die Eltern-Beschriftung über target_display_field_id.
+- Exportiertes HTML5-Kindformular zeigt die gekoppelte Eigenschaft vorausgewählt.
+- Export-Runtime sperrt die Vorauswahl und sendet den FK zusätzlich hidden.
+- Export-Runtime erzwingt den Eltern-FK bei create/update.
+- Eigene Darstellung für die gesperrte Vorauswahl vorhanden.
+
+Regression:
+- gesamte tests_*.php-Suite: 151/151 PASS
+- PHP lint: 860/860 PASS
+- JavaScript node --check: 5/5 PASS

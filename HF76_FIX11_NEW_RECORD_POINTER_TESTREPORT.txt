@@ -1,0 +1,18 @@
+HF76-FIX11 – DS-Neuanlage / Datensatzzeiger
+
+Umgesetzt:
+- bestehende DS-Zeiger normal/aktuell werden serverseitig aus der zentralen ButtonRegistry gerendert
+- neuer Datensatz verwendet neuer_ds.png als festen DS-Zeiger
+- keine Textsymbole ▶ oder * mehr als DS-Zeiger
+- beim Fokuswechsel einer Zeile wird der DS-Zeiger über die zentrale Registry zwischen normaler_ds und aktueller_ds umgeschaltet
+- Spalte Geändert zeigt beim ungespeicherten Datensatz nur einen neutralen Platzhalter
+- Anlageaktion verwendet neu.png, serverseitig und fest registriert
+- neuer Datensatz besitzt keine Löschaktion
+- HF56/HF57-Regressionstests auf die verbindliche Buttonset-Semantik aktualisiert
+
+Prüfung:
+- gezielter FIX11-Test: 10/10 PASS
+- Root-Regressionssuite: 131/131 PASS
+- PHP-Syntax: 832/832 PASS
+- JavaScript-Syntax: 3/3 PASS
+- Dateimanifest: 1223 Einträge neu erzeugt

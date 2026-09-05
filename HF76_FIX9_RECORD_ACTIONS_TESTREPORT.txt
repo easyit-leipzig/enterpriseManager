@@ -1,0 +1,7 @@
+HF76-FIX9 – DS-Zeilenaktionen
+
+Korrektur:
+- Anzeigen-Link ist explizit anzeigen.png / Kontext record.
+- Links erben keine umgebende Formularaktion mehr.
+- bulk_delete kann daher Anzeigen nicht mehr als loeschen.png dekorieren.
+- pro bestehendem DS verbleibt genau ein Zeilen-Löschbutton; der separate Mehrfach-Löschbutton bleibt oberhalb der Tabelle.
