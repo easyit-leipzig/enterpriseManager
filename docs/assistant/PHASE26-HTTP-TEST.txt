@@ -1,0 +1,7 @@
+PHASE 26 HTTP TEST: PASS
+
+- admin/assistants/run.php?assistant=dataform.trust-policy rendert erfolgreich.
+- integration-api.php?surface=assistant.center enthält dataform.trust-policy.
+- release-catalog-export.php?type=trust liefert JSON.
+- öffentlicher Trust-Export enthält weder privateKey noch secretKey.
+- Der während des HTTP-Tests erzeugte Laufzeitschlüssel wurde vor Paketbau vollständig entfernt.

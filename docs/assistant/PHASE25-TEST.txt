@@ -1,0 +1,16 @@
+Phase 25 Smoke-Test: PASS
+
+Geprüft:
+- ext-sodium / Ed25519 verfügbar
+- aktiver Signaturschlüssel wird lokal erzeugt
+- öffentlicher Trust-Status enthält keinen privaten Schlüssel
+- Phase-24-Gate -> RELEASED -> automatische signierte Katalogisierung
+- Paket-SHA, Release-Fingerprint, Gate-SHA und Ed25519-Signatur stimmen
+- vertrauensgeprüftes RELEASED kann gestaged werden
+- byteweise Paketmanipulation wird vor Staging blockiert
+- Schlüsselrotation erzeugt verketteten neuen Schlüssel
+- historisches Release bleibt mit altem Trusted Key verifizierbar
+- erneute Katalogisierung nutzt neuen aktiven Schlüssel
+- neuer Assistent ist zentral registriert
+
+Ergebnis: PHASE25_SMOKE_PASS

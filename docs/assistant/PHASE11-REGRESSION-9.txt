@@ -1,0 +1,3 @@
+PHASE9_SMOKE=PASS
+PROJECT_PATH=/tmp/easyit_phase9_120a5275/projects/muster-csv
+HANDOFF=datasource.configure -> dataform.create

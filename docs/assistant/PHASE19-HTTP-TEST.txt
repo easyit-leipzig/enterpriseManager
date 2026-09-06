@@ -1,0 +1,5 @@
+PHASE19 HTTP TEST
+- GET dataform.module-library: PASS
+- Assistententitel gerendert: PASS
+- Bibliotheksoperationen gerendert: PASS
+- integration-api assistant.center enthält dataform.module-library: PASS

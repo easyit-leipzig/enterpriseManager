@@ -1,0 +1,16 @@
+Assistant Phase 6 – HTTP Runtime Test
+=====================================
+
+PASS – Assistent in admin/assistants/index.php sichtbar.
+PASS – Profil CSV gespeichert.
+PASS – Connection-POST testet Datenquelle real.
+PASS – Erfolgreicher Verbindungstest wird angezeigt.
+PASS – CSV-Tabelle wird dynamisch als Auswahl angeboten.
+PASS – Source-POST führt zum Review.
+PASS – Review enthält easyit.datasource.assistant.v1.
+PASS – Review enthält CoreDatabaseBridge-Contract.
+PASS – Handoff-Link zum DataForm-Assistenten vorhanden.
+PASS – export.php liefert valides JSON.
+PASS – plaintextPasswordStored=false.
+
+PHASE6_HTTP=PASS

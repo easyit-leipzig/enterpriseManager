@@ -1,0 +1,3 @@
+
+JavaScript-Dateien gesamt: 5
+Ergebnis: PASS

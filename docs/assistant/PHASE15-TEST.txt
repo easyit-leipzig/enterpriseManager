@@ -1,0 +1,16 @@
+PASS: Vorlage mit kanonischem Schema gespeichert
+PASS: fünf DataForm-Konfigurationsbereiche erfasst
+PASS: Klon-Vorschau ist ohne Zielkonflikt gültig
+PASS: DataForm-Name gemappt
+PASS: Datenquellenprofil gemappt
+PASS: Eltern-DataForm gemappt
+PASS: zusätzliche Relationsreferenz gemappt
+PASS: Vorlage angewendet
+PASS: Zielzustand persistent geschrieben
+PASS: Aktionskonfiguration auf Ziel-DataForm umgeschrieben
+PASS: Übernahme ist in Phase-14-Historie versioniert
+PASS: vorhandenes Ziel blockiert ohne Überschreibbestätigung
+PASS: versioniertes Überschreiben wird als Warnung zugelassen
+PASS: Klartext-Secret wird aus Vorlage entfernt
+PASS: Secret-Referenz bleibt erlaubt
+PHASE15_SMOKE_PASS

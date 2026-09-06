@@ -1,0 +1,17 @@
+PHASE 26 SMOKE TEST: PASS
+
+Geprüft:
+- RELEASE erlaubt Installation
+- SUSPENDED blockiert Release-Verifikation und zentralen Stagingpfad
+- Reaktivierung stellt Verwendbarkeit wieder her
+- VERIFY_ONLY blockiert Installation, erfüllt aber die historische Policy
+- RELEASE kann administrativ wiederhergestellt werden
+- abgelaufener Schlüssel blockiert Signatur/Installation
+- Ablauf kann kontrolliert aufgehoben werden
+- Schlüsselrotation funktioniert
+- REVOKED blockiert Release sofort und ist irreversibel
+- Widerruf eines Chain-Ankers invalidiert abhängige Trust-Chain
+- Trust-Audit protokolliert Operationen
+- Audit-Hashkette verifiziert
+- manipuliertes Audit wird erkannt
+- dataform.trust-policy ist zentral registriert

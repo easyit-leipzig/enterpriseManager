@@ -1,0 +1,78 @@
+Assistant Phase 3 Test
+======================
+
+PHP lint:
+PASS - alle PHP-Dateien ohne Syntaxfehler
+
+Runtime:
+{
+    "ok": true,
+    "phase": 3,
+    "registered": [
+        "core.status",
+        "dataform.create",
+        "dataform.relations"
+    ],
+    "oneToMany": {
+        "schema": "easyit.dataform.relation.assistant.v1",
+        "name": "ev_info",
+        "type": "one_to_many",
+        "parent": {
+            "dataForm": "ed_ev",
+            "source": "ed_ev",
+            "keyField": "id"
+        },
+        "child": {
+            "dataForm": "ed_ev_info",
+            "source": "ed_ev_info",
+            "foreignKeyField": "to_ev_id"
+        },
+        "ui": {
+            "paginationPlacement": "below-records",
+            "buttonRegistry": "central"
+        },
+        "binding": {
+            "enabled": true,
+            "valueSource": "parent.currentRecord",
+            "parentValueField": "id",
+            "childTargetField": "to_ev_id",
+            "fillOnNewRecord": true,
+            "readOnly": true
+        }
+    },
+    "resolvedNewChildDefaults": {
+        "values": {
+            "to_ev_id": 42
+        },
+        "readOnlyFields": [
+            "to_ev_id"
+        ]
+    },
+    "manyToMany": {
+        "schema": "easyit.dataform.relation.assistant.v1",
+        "name": "ev_person",
+        "type": "many_to_many",
+        "parent": {
+            "dataForm": "ed_ev",
+            "source": "ed_ev",
+            "keyField": "id"
+        },
+        "child": {
+            "dataForm": "ed_person",
+            "source": "ed_person"
+        },
+        "ui": {
+            "paginationPlacement": "below-records",
+            "buttonRegistry": "central"
+        },
+        "manyToMany": {
+            "junctionSource": "ed_ev_person",
+            "parentForeignKeyField": "to_ev_id",
+            "childForeignKeyField": "to_person_id",
+            "childKeyField": "id"
+        }
+    },
+    "mismatchValidation": [
+        "Kind-Fremdschlüsselfeld und gebundenes Zielfeld müssen identisch sein."
+    ]
+}

@@ -1,0 +1,121 @@
+=== PHP LINT ===
+No syntax errors detected in ./admin/assistants/api.php
+No syntax errors detected in ./admin/assistants/run.php
+No syntax errors detected in ./admin/assistants/export.php
+No syntax errors detected in ./admin/assistants/index.php
+No syntax errors detected in ./system/assistant/field/FieldConfigCompiler.php
+No syntax errors detected in ./system/assistant/field/FieldDraft.php
+No syntax errors detected in ./system/assistant/field/LookupResolver.php
+No syntax errors detected in ./system/assistant/field/FieldTypeRegistry.php
+No syntax errors detected in ./system/assistant/field/DerivedEnumValueCodec.php
+No syntax errors detected in ./system/assistant/field/FieldDraftValidator.php
+No syntax errors detected in ./system/assistant/datasource/DataSourceAdapterInterface.php
+No syntax errors detected in ./system/assistant/datasource/ConnectionTestResult.php
+No syntax errors detected in ./system/assistant/datasource/DataSourceRegistry.php
+No syntax errors detected in ./system/assistant/datasource/DataSourceDraftValidator.php
+No syntax errors detected in ./system/assistant/datasource/adapters/AbstractPdoAdapter.php
+No syntax errors detected in ./system/assistant/datasource/adapters/MySqlDataSourceAdapter.php
+No syntax errors detected in ./system/assistant/datasource/adapters/OracleDataSourceAdapter.php
+No syntax errors detected in ./system/assistant/datasource/adapters/SQLiteDataSourceAdapter.php
+No syntax errors detected in ./system/assistant/datasource/adapters/CsvDataSourceAdapter.php
+No syntax errors detected in ./system/assistant/datasource/DataSourceConfigCompiler.php
+No syntax errors detected in ./system/assistant/datasource/DataFormDatabaseInterface.php
+No syntax errors detected in ./system/assistant/datasource/DataSourceDraft.php
+No syntax errors detected in ./system/assistant/datasource/CoreDatabaseBridge.php
+No syntax errors detected in ./system/assistant/assistants/ActionAssistant.php
+No syntax errors detected in ./system/assistant/assistants/DataFormAssistant.php
+No syntax errors detected in ./system/assistant/assistants/RelationAssistant.php
+No syntax errors detected in ./system/assistant/assistants/FieldAssistant.php
+No syntax errors detected in ./system/assistant/assistants/CoreStatusAssistant.php
+No syntax errors detected in ./system/assistant/assistants/DataSourceAssistant.php
+No syntax errors detected in ./system/assistant/assistants/EventAssistant.php
+No syntax errors detected in ./system/assistant/AssistantStep.php
+No syntax errors detected in ./system/assistant/bootstrap.php
+No syntax errors detected in ./system/assistant/AssistantManager.php
+No syntax errors detected in ./system/assistant/dataform/DataFormDraft.php
+No syntax errors detected in ./system/assistant/dataform/DataFormDraftValidator.php
+No syntax errors detected in ./system/assistant/dataform/DataFormConfigCompiler.php
+No syntax errors detected in ./system/assistant/AssistantResult.php
+No syntax errors detected in ./system/assistant/event/DataFormActionContextBuilder.php
+No syntax errors detected in ./system/assistant/event/EventDraftValidator.php
+No syntax errors detected in ./system/assistant/event/EventDraft.php
+No syntax errors detected in ./system/assistant/event/EventConfigCompiler.php
+No syntax errors detected in ./system/assistant/action/ActionDraft.php
+No syntax errors detected in ./system/assistant/action/ActionDraftValidator.php
+No syntax errors detected in ./system/assistant/action/ActionDefinition.php
+No syntax errors detected in ./system/assistant/action/ActionConfigCompiler.php
+No syntax errors detected in ./system/assistant/action/DataFormActionRegistry.php
+No syntax errors detected in ./system/assistant/state/AssistantStateStore.php
+No syntax errors detected in ./system/assistant/AssistantContextFactory.php
+No syntax errors detected in ./system/assistant/AssistantInterface.php
+No syntax errors detected in ./system/assistant/AssistantRegistry.php
+No syntax errors detected in ./system/assistant/AssistantContext.php
+No syntax errors detected in ./system/assistant/relation/RelationDraft.php
+No syntax errors detected in ./system/assistant/relation/RelationDraftValidator.php
+No syntax errors detected in ./system/assistant/relation/BoundValueResolver.php
+No syntax errors detected in ./system/assistant/relation/RelationConfigCompiler.php
+No syntax errors detected in ./tests/assistant/phase7_smoke.php
+No syntax errors detected in ./tests/assistant/phase6_smoke.php
+=== PHASE 6 REGRESSION ===
+PASS: CSV-Profil kann angelegt werden.
+PASS: CSV-Verbindungstest ist erfolgreich.
+PASS: Verbindungsteststatus ist true.
+PASS: CSV-Discovery findet beide Tabellen.
+PASS: CSV-Tabelle mit id wird als gültig erkannt.
+PASS: CSV-Tabelle ohne id wird als ungültig erkannt.
+PASS: Gültige CSV-Tabelle kann ausgewählt werden.
+PASS: Datenquellenprofil besteht Gesamtvalidierung.
+PASS: Export enthält Treiber csv.
+PASS: Export enthält ausgewählte Tabelle.
+PASS: CSV-Trennzeichen ist |.
+PASS: CSV-Pflichtfeld id ist festgeschrieben.
+PASS: Klartextkennwort wird nicht gespeichert.
+PASS: Core-Datenbankvertrag enthält query.
+PASS: Handoff zum DataForm-Assistenten wird erzeugt.
+PASS: DataForm importiert Profilnamen.
+PASS: DataForm importiert Treiber.
+PASS: DataForm importiert ausgewählte Hauptquelle.
+PASS: DataForm referenziert Profil statt Kennwortdaten zu kopieren.
+PASS: CSV-Tabelle ohne id wird bei Auswahl abgelehnt.
+PASS: MySQL-Test liefert definiertes Resultat unabhängig von lokaler Treiberinstallation.
+PASS: Verbindungstester gibt Kennwort nicht zurück.
+PASS: Oracle-Testresultat gibt Kennwort nicht zurück.
+PASS: CoreDatabaseBridge erfüllt den einheitlichen DataForm-Datenbankvertrag.
+PASS: CoreDatabaseBridge delegiert CRUD an die bestehende Core-Datenbankschicht.
+PHASE6_SMOKE=PASS
+=== PHASE 7 SMOKE ===
+PASS: DataForm-Vorentwurf ist gültig.
+PASS: DataForm erzeugt Handoff zum Feld-Assistenten.
+PASS: Feld-Assistent importiert DataForm-Kontext.
+PASS: DataForm-Name wird übernommen.
+PASS: Vorhandene DataForm-Felder werden übernommen.
+PASS: Basisfelder einschließlich lookup und derived_enum sind gültig.
+PASS: Lookup-Definition wird akzeptiert.
+PASS: Derived-Enum-Definition wird akzeptiert.
+PASS: Feldkonfiguration besteht Gesamtvalidierung.
+PASS: Feldkonfiguration ist exportbereit.
+PASS: Lookup referenziert die Quelltabelle.
+PASS: Lookup ist ein Einzelwert.
+PASS: Derived Enum referenziert die Quelltabelle.
+PASS: Derived Enum ist Mehrfachauswahl.
+PASS: Derived Enum speichert verbindlich kommasepariert.
+PASS: Derived Enum kann abhängig vom aktuellen Datensatz gefiltert werden.
+PASS: Filterwert stammt aus record.id.
+PASS: Feld-Assistent erzeugt Rück-Handoff zum DataForm-Assistenten.
+PASS: Derived-Enum-Codecs trimmen und deduplizieren.
+PASS: Derived-Enum-Codecs erzeugen kommaseparierte Werte.
+PASS: Optionen markieren gespeicherte Mehrfachwerte korrekt.
+PASS: Ein einzelner Schlüssel mit Komma wird abgewiesen.
+PASS: LookupResolver löst den Anzeigetext auf.
+PASS: Angereicherte Felder werden in den DataForm-Assistenten zurückimportiert.
+PASS: Endgültige DataForm-Konfiguration enthält Derived-Enum-Metadaten.
+PASS: Endgültige DataForm-Konfiguration enthält Lookup-Metadaten.
+PASS: Derived-Enum-Feld ohne Quellenbeschreibung wird abgelehnt.
+PHASE7_SMOKE=PASS
+=== JS ===
+PASS: JS normalisiert kommaseparierte Mehrfachwerte.
+PASS: JS dekodiert und dedupliziert.
+PASS: JS kodiert Mehrfachauswahl.
+PASS: JS weist einzelne Schlüssel mit Komma ab.
+PASS: JS synchronisiert Multiple-Select in das Speicherfeld.
+PHASE7_JS=PASS

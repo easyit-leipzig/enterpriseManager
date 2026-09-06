@@ -1,0 +1,13 @@
+PHASE27_HTTP_TEST=PASS
+
+Geprüft:
+- GET dataform.trust-recovery / overview
+- Integration-API enthält dataform.trust-recovery
+- POST Public-Trust-Bundle-Export
+- geschützter Download des erzeugten Public-Trust-Bundles
+- Initialisierung eines Ed25519-Keys über Trust-Policy
+- HTTP Private-Key-Backup mit Passphrase
+- Private-Key-Backup-Download-Link vorhanden
+- Passphrase wurde nicht in storage/ oder projects/ persistiert
+
+Runtime-Artefakte und während des Tests erzeugte private Schlüssel wurden vor dem Paketbau entfernt.

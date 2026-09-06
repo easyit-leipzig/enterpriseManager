@@ -1,0 +1,12 @@
+PHASE 12 SMOKE TEST
+===================
+PASS: Workflow-Assistent zentral registriert.
+PASS: Start ohne Kontext -> erster offener Schritt Projekt.
+PASS: Projekt- und DataForm-Kontext werden übernommen.
+PASS: Vollständiger gültiger Zustand -> 8/8 Schritte, 100 %, allComplete=true.
+PASS: Keine offene Station bei vollständig abgeschlossenem Workflow.
+PASS: Jeder Standardworkflow-Schritt wird als complete erkannt.
+PASS: Beziehungen können ausdrücklich als nicht benötigt bestätigt werden.
+PASS: Events können ausdrücklich als nicht benötigt bestätigt werden.
+PASS: Optionale Skip-Bestätigungen sind im Status nachvollziehbar.
+PHASE12_SMOKE=PASS

@@ -1,0 +1,40 @@
+Assistant Phase 14 – Teststatus
+================================
+
+PHASE14_SMOKE=PASS
+- Baseline + erste Version: PASS
+- zweite Version: PASS
+- Vorher/Nachher-Diff mit JSON-Pfad: PASS
+- Undo persistent: PASS
+- Redo persistent: PASS
+- neue Änderung nach Undo: PASS
+- alter Redo-Zweig bleibt abgelöst sichtbar: PASS
+- Restore beliebiger Version als neuer aktueller Stand: PASS
+- Reset/Clear per Undo wiederherstellbar: PASS
+- Klartextkennwort nicht in Historie: PASS
+- passwordRef in Historie zulässig: PASS
+- Backup enthält Historie: PASS
+- Restore unter neuer Projekt-ID retargetet Historie: PASS
+
+HTTP:
+- history.php GET: PASS
+- CSRF-Token: PASS
+- POST Undo: PASS
+- persistenter Zustand nach HTTP-Undo: PASS
+- Historie als JSON: PASS
+- Vorher/Nachher-Vergleich als JSON: PASS
+
+Regression:
+- Phase 6: PASS
+- Phase 7: PASS
+- Phase 8: PASS
+- Phase 9: PASS
+- Phase 10: PASS
+- Phase 11: PASS
+- Phase 12: PASS
+- Phase 13: PASS
+- Phase 14: PASS
+
+Syntax:
+- 98 PHP-Dateien: PASS
+- 5 JavaScript-Dateien: PASS

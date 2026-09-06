@@ -1,0 +1,17 @@
+PHASE 11 INTEGRATION POINTS
+===========================
+
+Projektverwaltung       -> surface project.management
+Projekt-Detail           -> surface project.detail
+Datenquelle              -> surface datasource
+DataForm-Hauptansicht    -> surface dataform
+Feldeditor               -> surface dataform.fields
+Beziehungsdesigner       -> surface dataform.relations
+Eventeditor              -> surface dataform.events
+Aktions-/Buttoneditor    -> surface dataform.actions
+Test/Diagnose            -> surface dataform.diagnostics
+
+PHP: admin/assistants/_launcher.php
+JS : assets/js/assistant-launcher.js
+API: admin/assistants/integration-api.php
+Kontextseite: admin/assistants/contextual.php

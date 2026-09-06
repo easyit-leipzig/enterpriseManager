@@ -1,0 +1,9 @@
+Phase 20 HTTP-Test
+==================
+
+PASS:
+- GET admin/assistants/run.php?assistant=dataform.module-dependencies
+- Assistententitel wird gerendert
+- Integration-API surface=assistant.center liefert dataform.module-dependencies
+
+Ergebnis: HTTP20_PASS

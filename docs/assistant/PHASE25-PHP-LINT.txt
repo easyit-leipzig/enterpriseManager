@@ -1,0 +1,2 @@
+PHP-Syntaxprüfung: PASS
+142 PHP-Dateien geprüft.

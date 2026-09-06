@@ -1,0 +1,4 @@
+PHASE 23 JAVASCRIPT LINT
+========================
+5 JavaScript-Dateien unter assets/ geprüft mit node --check.
+Ergebnis: PASS – keine Syntaxfehler.

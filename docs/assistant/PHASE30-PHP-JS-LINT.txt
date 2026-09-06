@@ -1,0 +1,4 @@
+PHP files: 161
+JavaScript files: 5
+PHP syntax: PASS
+JavaScript syntax: PASS

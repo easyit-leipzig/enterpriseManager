@@ -1,0 +1,16 @@
+PASS: Diagnose-Assistent ist zentral registriert.
+PASS: Diagnose-Kontext kann gespeichert werden.
+PASS: Diagnosebericht wird erzeugt.
+PASS: Vollständig gültige Konfiguration erhält PASS.
+PASS: Gültige Konfiguration hat keine FAIL-Prüfung.
+PASS: CSV-Datenquelle wird real erneut getestet.
+PASS: Gebundener Elternwert id=42 wird als to_ev_id=42 geprüft.
+PASS: DataFormActionContext besteht Laufzeitprüfung.
+PASS: Zentrale Button-Registry besteht Diagnose.
+PASS: CRUD und Aktionsbuttons sind konsistent.
+PASS: Nichtdestruktiver CRUD-Workflow-Test besteht.
+PASS: Defekte Konfiguration erhält FAIL.
+PASS: Falsche Pagination wird konkret als FAIL gemeldet.
+PASS: CRUD/Button-Widerspruch wird konkret als FAIL gemeldet.
+PASS: Fehlendes Datenquellenprofil wird konkret als FAIL gemeldet.
+PHASE8_SMOKE=PASS

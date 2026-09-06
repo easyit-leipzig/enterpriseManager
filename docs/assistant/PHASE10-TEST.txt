@@ -1,0 +1,19 @@
+PASS: Backup mit lokaler Datenbank wird erzeugt.
+PASS: Backup-ZIP existiert.
+PASS: Archiv-SHA-Datei existiert.
+PASS: Backup-Manifest und Datei-Prüfsummen sind gültig.
+PASS: CSV-Projektdatenbank ist im Backup markiert.
+PASS: CSV-Datenbankdatei ist im Backup enthalten.
+PASS: Alte interne Backups werden standardmäßig nicht rekursiv eingebettet.
+PASS: Restore überschreibt vorhandenes Projekt nicht.
+PASS: Restore unter neuer Projekt-ID ist erfolgreich.
+PASS: Gesicherte CSV-Datei wurde wiederhergestellt.
+PASS: project.json wird auf neue Projekt-ID retargetet.
+PASS: Projektpfad wird retargetet.
+PASS: Datenquellenpfad wird auf neues Projekt retargetet.
+PASS: Recovery-Diagnose endet mit PASS.
+PASS: Backup ohne Projektdatenbank wird erzeugt.
+PASS: Datenbank ist bei deaktivierter Option nicht enthalten.
+PASS: CSV-Datenbankdatei wird tatsächlich ausgelassen.
+PASS: Unsicherer ../-Pfad im Manifest wird abgelehnt.
+PHASE10_SMOKE_PASS

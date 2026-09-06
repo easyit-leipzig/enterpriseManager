@@ -1,0 +1,21 @@
+PASS: Projektverwaltung ist als Oberfläche registriert.
+PASS: DataForm ist als Oberfläche registriert.
+PASS: Projektverwaltung wird aus Route erkannt.
+PASS: Beziehungsoberfläche wird aus Route erkannt.
+PASS: Feldoberfläche wird aus Route erkannt.
+PASS: dataform.create ist auf der DataForm-Oberfläche verfügbar.
+PASS: dataform.fields ist auf der DataForm-Oberfläche verfügbar.
+PASS: dataform.relations ist auf der DataForm-Oberfläche verfügbar.
+PASS: dataform.events ist auf der DataForm-Oberfläche verfügbar.
+PASS: dataform.actions ist auf der DataForm-Oberfläche verfügbar.
+PASS: dataform.diagnostics ist auf der DataForm-Oberfläche verfügbar.
+PASS: Feld-Assistent ist mit DataForm-Kontext direkt startbar.
+PASS: Projektkontext wird in URL übernommen.
+PASS: DataForm-Kontext wird in URL übernommen.
+PASS: Datensatzkontext wird in URL übernommen.
+PASS: Ursprungsoberfläche bleibt im Wizard erhalten.
+PASS: Fehlender DataForm-Kontext deaktiviert DataForm-spezifischen Starter.
+PASS: Renderer kennzeichnet die Oberfläche.
+PASS: Renderer enthält DataForm-Kontext.
+PASS: Launcher erzeugt keine lokalen farbigen Button-Hintergründe.
+PHASE11_SMOKE_PASS

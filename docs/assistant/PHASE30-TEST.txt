@@ -1,0 +1,20 @@
+PASS: Public Trust auf a importiert
+PASS: Public Trust auf b importiert
+PASS: Public Trust auf c importiert
+PASS: Standby A besitzt Recovery-Signing-Key
+PASS: Ausgangscluster P/A/B mit Quorum 2
+PASS: PRIMARY besitzt vor Reconfiguration gültiges Lease
+PASS: Zielmitgliedschaft nimmt C voting auf und setzt B non-voting
+PASS: Altes Quorum ohne neues Quorum reicht für Joint Consensus nicht
+PASS: Joint Consensus mit altem UND neuem Quorum aktiviert
+PASS: Release-Signierung während Joint Consensus gefenced
+PASS: Leadership-Lease während Joint Consensus pausiert
+PASS: Membership-Epoche 2 aktiv: vier Mitglieder, drei Voting, Quorum 2
+PASS: Voting→Non-Voting Änderung für B aktiv
+PASS: Nach Reconfiguration neues Lease gegen neue Membership aufgebaut
+PASS: Entfernte Instanz erkennt finale Entfernung
+PASS: Entfernte Instanz wird lokal RETIRED/VERIFY_ONLY gefenced
+PASS: Finale Membership-Epoche 3 enthält B nicht mehr
+PASS: Membership-Audit-Hashketten gültig
+PASS: Phase-30-Assistent zentral registriert
+PHASE30_SMOKE_PASS

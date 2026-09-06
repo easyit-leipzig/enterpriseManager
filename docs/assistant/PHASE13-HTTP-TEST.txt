@@ -1,0 +1,18 @@
+Phase 13 HTTP-Wiederaufnahmetest
+================================
+
+Testablauf:
+1. Projekt phase13-http projektbezogen anlegen.
+2. workflow.standard mit Projektkontext starten; der Workflow schreibt den persistenten Zustand und den minimalen Active-Pointer.
+3. Datenquellen-Assistent aus dem Workflow gezielt mit step=connection aufrufen.
+4. Neue HTTP-Anfrage ohne Session-Cookie und ohne project_id/dataform_id an workflow.standard senden.
+
+Ergebnis: PASS
+- Projekt phase13-http wird ohne Query-Kontext wieder aufgenommen.
+- Oberfläche zeigt "Projektpersistenz aktiv".
+- Speicherort wird als projects/phase13-http/config/assistant/state/ angezeigt.
+- Der Fortsetzungslink für datasource.configure enthält wieder step=connection.
+- Es wurde kein Session-Cookie zwischen Schritt 3 und 4 vorausgesetzt.
+
+HTTP_RESUME=PASS
+EXACT_SUBSTEP_RESUME=PASS

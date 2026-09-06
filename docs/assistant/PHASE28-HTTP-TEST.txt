@@ -1,0 +1,5 @@
+PHASE 28 HTTP TEST
+==================
+PASS: /admin/assistants/run.php?assistant=dataform.trust-federation&step=overview rendert den neuen Assistenten.
+PASS: /admin/assistants/integration-api.php?surface=assistant.center liefert dataform.trust-federation.
+PASS: Download-Endpunkt trust-federation-download.php besitzt Basename-/Traversal-/Realpath-Schutz.

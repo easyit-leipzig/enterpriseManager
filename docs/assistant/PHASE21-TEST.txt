@@ -1,0 +1,15 @@
+Phase 21 Kern-Smoke-Test
+========================
+PASS Initialinstallation
+PASS Update-Suche erkennt höheres Release
+PASS Reverse-Dependency blockiert inkompatibles Major-Upgrade
+PASS kompatibles Folgeupdate wird bei Kaskade automatisch ergänzt
+PASS konsistenter Zielversionssatz
+PASS Upgrade-Ausführung
+PASS vollständiges Rollback-Projektbackup vor Upgrade
+PASS SHA-256-Datei zum Rollback-Backup
+PASS Update des Installationsregisters
+PASS Checkpoint-Metadaten
+PASS erneute Suche meldet CURRENT
+PASS zentrale Registrierung dataform.module-updates
+PHASE21_SMOKE_PASS

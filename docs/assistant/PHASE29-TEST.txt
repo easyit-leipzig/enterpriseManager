@@ -1,0 +1,25 @@
+PASS: Drei Phase-28-Instanzen bereit
+PASS: Release-Trust auf Secondary A importiert
+PASS: Release-Trust auf Secondary B importiert
+PASS: Secondary A besitzt wiederhergestellten Release-Signing-Key für Failover
+PASS: Separate Ed25519-Failover-Identities erzeugt
+PASS: 3er-Cluster besitzt Mehrheitsquorum 2
+PASS: Signierte Clusterkonfiguration auf beide SECONDARY importiert
+PASS: PRIMARY darf nach Phase-29-Aktivierung ohne Quorum-Lease nicht signieren
+PASS: PRIMARY-Lease nur mit Quorum-ACK aktiviert
+PASS: PRIMARY mit gültigem Quorum-Lease darf signieren
+PASS: SECONDARY beobachtet PRIMARY-Heartbeat
+PASS: Staler Heartbeat allein erlaubt vor Lease-Ablauf noch keinen Failover
+PASS: Election vor sicherem Lease-Ablauf blockiert
+PASS: SECONDARY wird erst nach Lease-Ablauf plus Grace failoverfähig
+PASS: Alter PRIMARY ist nach Lease-Ablauf kryptographisch vom Release-Signing gefenced
+PASS: Quorum stimmt in neuer Election-Epoche 2 ab
+PASS: Peer darf in derselben Epoche nicht für konkurrierenden Kandidaten stimmen
+PASS: SECONDARY A mit Mehrheitsquorum auf PRIMARY promotet
+PASS: Neuer PRIMARY darf mit Election-Quorum-Lease signieren
+PASS: Peer verweigert Lease-Erneuerung des alten PRIMARY nach höherer Election-Epoche
+PASS: Lease-Erneuerung mit nur einer Stimme ist blockiert
+PASS: Neuer PRIMARY erneuert Lease nur mit Quorum
+PASS: Failover-Audit-Hashketten sind gültig
+PASS: Phase-29-Assistent zentral registriert
+PHASE29_SMOKE_PASS
