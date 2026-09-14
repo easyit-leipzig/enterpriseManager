@@ -1,4 +1,0 @@
-<?php
-declare(strict_types=1);
-$files=[__DIR__.'/DataForm5-Core/system/monitoring/Core/HealthManager.php',__DIR__.'/DataForm5-Core/system/monitoring/Core/MetricsCollector.php',__DIR__.'/DataForm5-Core/system/monitoring/Core/WorkerHeartbeat.php',__DIR__.'/DataForm5-Core/system/monitoring/Core/AlertManager.php',__DIR__.'/DataForm5-Core/system/monitoring/Providers/MonitoringServiceProvider.php',__DIR__.'/app/monitoring/index.php',__DIR__.'/app/monitoring/api.php',__DIR__.'/docs/PHASE_U_MONITORING.md'];
-foreach($files as $f) if(!is_file($f)){fwrite(STDERR,"Missing {$f}\n");exit(1);} $boot=(string)file_get_contents(__DIR__.'/DataForm5-Core/config/providers.php'); if(!str_contains($boot,'MonitoringServiceProvider')) exit(2); $app=(string)file_get_contents(__DIR__.'/system/app/bootstrap.php'); foreach(['monitoring.view','monitoring.manage','enterprise_monitoring'] as $n) if(!str_contains($app,$n)) exit(3); echo "PHASE_U_MONITORING_OK\n";

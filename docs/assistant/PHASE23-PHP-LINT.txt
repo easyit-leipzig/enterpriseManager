@@ -1,4 +1,0 @@
-PHASE 23 PHP LINT
-=================
-134 PHP-Dateien unter system/, admin/ und tests/ geprüft.
-Ergebnis: PASS – keine Syntaxfehler.

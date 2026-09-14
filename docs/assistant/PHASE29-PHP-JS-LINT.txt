@@ -1,8 +1,0 @@
-Phase 29 Gesamt-Syntaxprüfung
-=============================
-PHP-Dateien: 157
-JavaScript-Dateien: 5
-Ergebnis: PASS
-
-Alle PHP-Dateien wurden mit `php -l` geprüft.
-Alle JavaScript-Dateien unter assets/js wurden mit `node --check` geprüft.

@@ -1,4 +1,0 @@
-Vollständige Assistant-Regression Phase 6 bis Phase 25: PASS
-
-Alle vorhandenen Smoke-Tests phase6_smoke.php bis phase25_smoke.php wurden erfolgreich ausgeführt.
-Phase 25 bleibt rückwärtskompatibel mit Phase 6 bis Phase 24.

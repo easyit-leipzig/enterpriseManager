@@ -1,5 +1,0 @@
-Phase 22 HTTP-Test
-==================
-PASS: /admin/assistants/run.php?assistant=dataform.module-migrations&step=project
-PASS: Titel "Modul-Updates und Migrationen" gerendert.
-PASS: integration-api surface=assistant.center enthält dataform.module-migrations.

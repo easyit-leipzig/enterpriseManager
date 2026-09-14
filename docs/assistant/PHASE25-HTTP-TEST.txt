@@ -1,8 +1,0 @@
-Phase 25 HTTP-Test: PASS
-
-Geprüft:
-- admin/assistants/run.php?assistant=dataform.release-catalog&step=overview rendert erfolgreich
-- Ed25519-Trust-Store wird angezeigt
-- Integration-API enthält dataform.release-catalog
-- öffentlicher Trust-Store-Export liefert valides JSON
-- Export enthält keinen privaten Schlüssel

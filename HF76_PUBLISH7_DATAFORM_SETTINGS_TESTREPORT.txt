@@ -1,8 +1,0 @@
-HF76-PUBLISH7 – DataForm-Einstellungen bearbeiten
-Dedicated settings test: 12/12 PASS
-Root regression suite: 142/142 PASS
-Changed runtime PHP syntax: PASS
-Settings available: name, slug, description, status, manual/adhoc save mode, save-success notification.
-DataForm list includes central Edit button.
-Physical table binding is shown read-only.
-Links to Layout & Behavior, Workflow and Relations are present.

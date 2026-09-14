@@ -1,5 +1,0 @@
-PASS: ./assets/js/assistant-launcher.js
-PASS: ./assets/js/assistant.js
-PASS: ./assets/js/dataform-actions.js
-PASS: ./assets/js/dataform-events.js
-PASS: ./assets/js/dataform-fields.js

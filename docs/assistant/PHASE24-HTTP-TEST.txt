@@ -1,4 +1,0 @@
-Phase 24 HTTP test: PASS
-- admin/assistants/run.php?assistant=dataform.module-release-gate&step=select rendered successfully.
-- Heading "Migrations-Gate und Release-Freigabe" found.
-- integration-api.php?surface=assistant.center returned dataform.module-release-gate.

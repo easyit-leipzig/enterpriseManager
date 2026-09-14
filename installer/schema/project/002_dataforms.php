@@ -1,6 +1,0 @@
-<?php
-declare(strict_types=1);
-return static function (PDO $pdo): void {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS dataforms (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(160) NOT NULL, slug VARCHAR(160) NOT NULL UNIQUE, description TEXT NULL, status VARCHAR(30) NOT NULL DEFAULT 'draft', table_save_mode VARCHAR(20) NOT NULL DEFAULT 'manual', show_save_success TINYINT(1) NOT NULL DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-    $pdo->exec("CREATE TABLE IF NOT EXISTS dataform_fields (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, dataform_id BIGINT UNSIGNED NOT NULL, name VARCHAR(160) NOT NULL, label VARCHAR(190) NOT NULL, field_type VARCHAR(80) NOT NULL, position INT NOT NULL DEFAULT 0, is_required TINYINT(1) NOT NULL DEFAULT 0, configuration_json LONGTEXT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_field_form FOREIGN KEY(dataform_id) REFERENCES dataforms(id) ON DELETE CASCADE, UNIQUE KEY uq_form_field(dataform_id,name)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-};

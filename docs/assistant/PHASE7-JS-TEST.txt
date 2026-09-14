@@ -1,6 +1,0 @@
-PASS: JS normalisiert kommaseparierte Mehrfachwerte.
-PASS: JS dekodiert und dedupliziert.
-PASS: JS kodiert Mehrfachauswahl.
-PASS: JS weist einzelne Schlüssel mit Komma ab.
-PASS: JS synchronisiert Multiple-Select in das Speicherfeld.
-PHASE7_JS=PASS

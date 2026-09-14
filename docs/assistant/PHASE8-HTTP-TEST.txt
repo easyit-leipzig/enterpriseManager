@@ -1,8 +1,0 @@
-PHASE8 HTTP TEST
-================
-PASS: Assistent dataform.diagnostics erscheint in der Assistentenübersicht.
-PASS: Diagnose-Kontext kann per HTTP/Session gespeichert werden.
-PASS: Diagnosebericht wird ohne PHP-Fehler gerendert.
-PASS: FAIL-Bericht wird bei fehlender Projektkonfiguration korrekt dargestellt.
-PASS: JSON-Export liefert Schema easyit.dataform.diagnostic-report.v1.
-HTTP_PHASE8=PASS

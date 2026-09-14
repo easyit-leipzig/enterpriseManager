@@ -1,5 +1,0 @@
-Phase 21 HTTP-Test
-==================
-PASS admin/assistants/run.php rendert dataform.module-updates
-PASS Schritt scan rendert für ein Projekt den Zustand CURRENT bei leerem Installationsregister
-PASS integration-api.php liefert dataform.module-updates für assistant.center

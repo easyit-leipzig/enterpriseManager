@@ -1,8 +1,0 @@
-{
-  "name": "demo-module",
-  "version": "1.0.0",
-  "entry": "DataForm5\\DemoModule\\DemoModule",
-  "dependencies": [],
-  "enabled": true,
-  "description": "Referenzmodul für das DataForm5-Core-Modulsystem"
-}

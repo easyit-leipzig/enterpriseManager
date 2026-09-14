@@ -1,6 +1,0 @@
-PASS: HTTP-Einstiegsseite
-PASS: HTTP-Wizard Review
-PASS: HTTP-JSON-Export
-PASS: Derived-Enum-Kommatrenner
-PASS: Lookup-Quelle im Export
-PHASE7_HTTP=PASS

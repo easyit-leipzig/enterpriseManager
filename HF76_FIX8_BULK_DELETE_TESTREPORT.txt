@@ -1,4 +1,0 @@
-HF76-FIX8 bulk delete toolbar
-- bulk delete button in records.php mapped to registry type loeschen / context bulk
-- central title: Ausgewählte Datensätze löschen
-- source package base: FIX7

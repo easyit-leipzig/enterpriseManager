@@ -1,5 +1,0 @@
-HF76-FIX10: server-side canonical row-action images; fixed semantics; JS cachebuster.
-Targeted: 10/10 PASS
-Root regression: 130/130 PASS
-Touched PHP lint: PASS
-JS syntax: PASS

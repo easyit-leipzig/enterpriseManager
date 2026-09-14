@@ -1,6 +1,0 @@
-PHASE 23 HTTP TEST
-==================
-PASS: Admin-Assistent dataform.module-migration-history rendert über den echten PHP-HTTP-Endpunkt.
-PASS: Historienliste wird für ein Projekt mit protokolliertem Migrationslauf angezeigt.
-PASS: JSON-Export der Migrationshistorie liefert den erwarteten Run.
-PASS: integration-api enthält dataform.module-migration-history auf assistant.center.

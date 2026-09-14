@@ -1,7 +1,0 @@
-Phase 29 HTTP-Test
-==================
-GET /admin/assistants/run.php?assistant=dataform.trust-failover : PASS
-- Titel `PRIMARY-Failover und Quorum-Schutz` gerendert
-
-GET /admin/assistants/integration-api.php?surface=assistant.center : PASS
-- `dataform.trust-failover` in zentraler Integration enthalten

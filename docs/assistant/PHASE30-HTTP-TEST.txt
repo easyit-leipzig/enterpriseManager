@@ -1,3 +1,0 @@
-Assistant HTTP render: PASS
-Integration API registration: PASS
-Assistant ID: dataform.trust-membership
