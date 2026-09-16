@@ -19,6 +19,11 @@ function enterprise_project_store_valid_name(string $name): bool
     return preg_match('/^[A-Za-z][A-Za-z0-9_]{1,62}$/', $name) === 1;
 }
 
+function enterprise_project_store_valid_pgsql_schema(string $name): bool
+{
+    return preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/', $name) === 1;
+}
+
 function enterprise_project_store_csv_base(array $env): string
 {
     $root = dirname(__DIR__, 2);
@@ -51,6 +56,14 @@ function enterprise_project_store_sqlite_database_path(array $env, string $datab
     return enterprise_project_store_sqlite_base($env) . '/' . $database . '.sqlite';
 }
 
+
+function enterprise_project_store_pgsql_schema(array $env): string
+{
+    $schema=trim((string)($env['PROJECT_DB_SCHEMA']??'public')) ?: 'public';
+    if (!enterprise_project_store_valid_pgsql_schema($schema)) throw new RuntimeException('Ungültiger PostgreSQL-Projektschemaname.');
+    return $schema;
+}
+
 function enterprise_project_store_pgsql_server(array $env, ?string $maintenanceDatabase = null): PDO
 {
     foreach (['PROJECT_DB_HOST','PROJECT_DB_PORT','PROJECT_DB_USERNAME'] as $key) {
@@ -63,7 +76,8 @@ function enterprise_project_store_pgsql_server(array $env, ?string $maintenanceD
         (int)$env['PROJECT_DB_PORT'],
         $maintenanceDatabase,
         (string)$env['PROJECT_DB_USERNAME'],
-        (string)($env['PROJECT_DB_PASSWORD'] ?? '')
+        (string)($env['PROJECT_DB_PASSWORD'] ?? ''),
+        'public'
     );
 }
 
@@ -75,7 +89,8 @@ function enterprise_project_store_pgsql_pdo(array $env, string $database): PDO
         (int)($env['PROJECT_DB_PORT'] ?? 5432),
         $database,
         (string)($env['PROJECT_DB_USERNAME'] ?? ''),
-        (string)($env['PROJECT_DB_PASSWORD'] ?? '')
+        (string)($env['PROJECT_DB_PASSWORD'] ?? ''),
+        enterprise_project_store_pgsql_schema($env)
     );
 }
 
@@ -164,6 +179,10 @@ function enterprise_project_store_exists(array $env, string $database, ?string $
             $server=enterprise_project_store_pgsql_server($env);
             $st=$server->prepare('SELECT 1 FROM pg_database WHERE datname=?');
             $st->execute([$database]);
+            if($st->fetchColumn()===false)return false;
+            $schema=enterprise_project_store_pgsql_schema($env);
+            $target=new EnterprisePgsqlPdo((string)$env['PROJECT_DB_HOST'],(int)$env['PROJECT_DB_PORT'],$database,(string)$env['PROJECT_DB_USERNAME'],(string)($env['PROJECT_DB_PASSWORD']??''),'public');
+            $st=$target->prepare('SELECT 1 FROM pg_namespace WHERE nspname=?');$st->execute([$schema]);
             return $st->fetchColumn()!==false;
         } catch (Throwable) { return false; }
     }
@@ -194,6 +213,13 @@ function enterprise_project_store_create(array $env, string $database, ?string $
             $quoted='"'.str_replace('"','""',$database).'"';
             $server->exec('CREATE DATABASE '.$quoted." ENCODING 'UTF8' TEMPLATE template0");
         }
+        $st=$server->prepare('SELECT 1 FROM pg_database WHERE datname=?');$st->execute([$database]);
+        if($st->fetchColumn()===false)throw new RuntimeException('PostgreSQL-Projektdatenbank wurde nach CREATE DATABASE nicht gefunden: '.$database);
+        $schema=enterprise_project_store_pgsql_schema($env);
+        $target=new EnterprisePgsqlPdo((string)$env['PROJECT_DB_HOST'],(int)$env['PROJECT_DB_PORT'],$database,(string)$env['PROJECT_DB_USERNAME'],(string)($env['PROJECT_DB_PASSWORD']??''),'public');
+        $target->exec('CREATE SCHEMA IF NOT EXISTS "'.$schema.'"');
+        $st=$target->prepare('SELECT 1 FROM pg_namespace WHERE nspname=?');$st->execute([$schema]);
+        if($st->fetchColumn()===false)throw new RuntimeException('PostgreSQL-Projektschema wurde nach CREATE SCHEMA nicht gefunden: '.$schema);
         return enterprise_project_store_pgsql_pdo($env,$database);
     }
     if ($driver === 'mssql') {
@@ -258,6 +284,17 @@ function enterprise_project_store_delete(array $env, string $database, ?string $
     }
     if ($driver === 'pgsql') {
         if (!enterprise_project_store_valid_name($database)) throw new RuntimeException('Ungültiger PostgreSQL-Projektdatenbankname.');
+        $schema=enterprise_project_store_pgsql_schema($env);
+        $adminDriver=strtolower(trim((string)($env['ADMIN_DB_DRIVER']??'')));
+        if(in_array($adminDriver,['postgres','postgresql'],true))$adminDriver='pgsql';
+        $adminDatabase=trim((string)($env['ADMIN_DB_DATABASE']??''));
+        $adminSchema=trim((string)($env['ADMIN_DB_SCHEMA']??'public')) ?: 'public';
+        if($adminDriver==='pgsql' && $adminDatabase===$database){
+            if($adminSchema===$schema) throw new RuntimeException('PostgreSQL-Projektschema entspricht dem Administrationsschema und darf nicht gelöscht werden.');
+            $target=new EnterprisePgsqlPdo((string)$env['PROJECT_DB_HOST'],(int)$env['PROJECT_DB_PORT'],$database,(string)$env['PROJECT_DB_USERNAME'],(string)($env['PROJECT_DB_PASSWORD']??''),'public');
+            $target->exec('DROP SCHEMA IF EXISTS "'.$schema.'" CASCADE');
+            return true;
+        }
         $server=enterprise_project_store_pgsql_server($env);
         try { $st=$server->prepare('SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname=? AND pid<>pg_backend_pid()');$st->execute([$database]); } catch (Throwable) {}
         $quoted='"'.str_replace('"','""',$database).'"';
@@ -364,6 +401,7 @@ function enterprise_project_store_ensure_default_pgsql_source(PDO $pdo, array $e
         'host'=>(string)($env['PROJECT_DB_HOST']??'127.0.0.1'),
         'port'=>(int)($env['PROJECT_DB_PORT']??5432),
         'database'=>$database,
+        'schema'=>enterprise_project_store_pgsql_schema($env),
         'username'=>(string)($env['PROJECT_DB_USERNAME']??''),
         'charset'=>'UTF8',
     ],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);

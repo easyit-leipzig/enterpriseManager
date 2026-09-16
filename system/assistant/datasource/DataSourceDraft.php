@@ -24,6 +24,7 @@ final class DataSourceDraft implements \JsonSerializable
                 'host' => '127.0.0.1',
                 'port' => 3306,
                 'database' => '',
+                'schema' => 'public',
                 'username' => '',
                 'passwordRef' => '',
                 'charset' => 'utf8mb4',

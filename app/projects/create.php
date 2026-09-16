@@ -7,8 +7,14 @@ require_once dirname(__DIR__, 2) . '/system/app/project_store.php';
 
 $user = enterprise_require_auth('../../');
 enterprise_require_capability($user,'projects.create');
-$pdo = enterprise_pdo();
-enterprise_upgrade($pdo);
+$pdo = null;
+$adminStoreError = '';
+try {
+    $pdo = enterprise_pdo();
+    enterprise_upgrade($pdo);
+} catch (Throwable $e) {
+    $adminStoreError = $e->getMessage();
+}
 $env = enterprise_env(dirname(__DIR__, 2) . '/DataForm5-Core/.env');
 $error = '';
 $messages = [];
@@ -114,6 +120,9 @@ function project_provision_install_schema(PDO $server, string $database, string 
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         enterprise_check_csrf((string)($_POST['csrf_token'] ?? ''));
+        if (!($pdo instanceof PDO)) {
+            throw new RuntimeException($adminStoreError !== '' ? $adminStoreError : 'Der Administrationsspeicher ist nicht verfügbar. Führen Sie zuerst das Setup durch.');
+        }
         foreach(array_keys($form) as $key) $form[$key]=trim((string)($_POST[$key] ?? $form[$key]));
 
         if ($form['name']==='') throw new RuntimeException('Projektname ist erforderlich.');
@@ -179,7 +188,19 @@ render_breadcrumbs([['label'=>'Enterprise','href'=>'../dashboard.php'],['label'=
 <section class="hero"><span class="badge">HF11 · Project Provisioning</span><h1>Neues Projekt anlegen</h1>
 <p>Erzeugt einen neuen Projektdatenspeicher entsprechend <code>PROJECT_DB_DRIVER</code> (MariaDB/MySQL, CSV, SQLite oder PostgreSQL), installiert das DataForm-Basisschema und registriert das Projekt anschließend.</p>
 <div class="actions"><a class="button secondary" href="register.php">Vorhandenes Projekt registrieren</a><a class="button secondary" href="restore.php">Projektsicherung wiederherstellen</a></div></section>
+<?php if($adminStoreError !== ''):?>
+<div class="notice error" role="alert">
+<strong>Administrationsspeicher nicht verfügbar.</strong><br>
+<?=e($adminStoreError)?>
+<div class="actions" style="margin-top:1rem">
+<a class="button" <?= easyit_button_attributes('einstellungen','setup') ?> href="../../setup.php">Setup durchführen</a>
+<a class="button secondary" <?= easyit_button_attributes('datenbank_assistent') ?> href="../../installer/database.php">Datenbank-Assistent öffnen</a>
+<a class="button secondary" <?= easyit_button_attributes('zurueck') ?> href="index.php">Zur Projektliste</a>
+</div>
+</div>
+<?php endif;?>
 <?php if($error):?><div class="notice error" role="alert"><?=e($error)?></div><?php endif;?>
+<?php if($pdo instanceof PDO):?>
 <section class="card"><form method="post" class="form-grid">
 <input type="hidden" name="csrf_token" value="<?=e(enterprise_csrf())?>">
 <label>Projektname<input name="name" required value="<?=e($form['name'])?>" placeholder="Testprojekt 63"></label>
@@ -189,6 +210,7 @@ render_breadcrumbs([['label'=>'Enterprise','href'=>'../dashboard.php'],['label'=
 <div class="form-span notice"><strong>Ablauf:</strong> Projektdatenspeicher erzeugen → Projektschema installieren → Projekt registrieren. Bei einem Fehler vor Abschluss wird die neu erzeugte Datenbank wieder entfernt.</div>
 <div class="form-span button-row"><button class="button" type="submit">Projekt vollständig anlegen</button><a class="button secondary" href="index.php">Abbrechen</a></div>
 </form></section>
+<?php endif;?>
 <?php
 $content=ob_get_clean();
 render_page(['title'=>'Neues Projekt anlegen','active'=>'projects','base'=>'../../','content'=>$content,'app_nav'=>true,'user'=>$user,'help'=>[

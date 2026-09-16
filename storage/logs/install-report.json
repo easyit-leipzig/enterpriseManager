@@ -1,0 +1,81 @@
+{
+    "enterprise_version": "RC1.8-FC1-HF76",
+    "installed_at": "2026-09-15T12:14:14+02:00",
+    "admin_user_id": 1,
+    "database": "easyit_admin",
+    "admin_store_driver": "pgsql",
+    "admin_store_database": "easyit_admin",
+    "admin_store_schema": "easyit_admin",
+    "admin_store_path": null,
+    "project_store_driver": "pgsql",
+    "project_store_database": "easyit_project_demo",
+    "project_store_schema": "easyit_project_demo",
+    "project_store_path": null,
+    "products": [
+        "dataform",
+        "pgsql-engine"
+    ],
+    "schema_files": [
+        "001_migrations.php",
+        "002_identity.php",
+        "003_projects_audit.php",
+        "004_licensing.php",
+        "005_superadmin.php"
+    ],
+    "project_schema_files": [
+        "001_migrations.php",
+        "002_dataforms.php",
+        "003_data_sources.php",
+        "004_table_workspace.php",
+        "005_dataform_table_bindings.php",
+        "006_dataform_runtime_options.php",
+        "007_dataform_search_filter_options.php"
+    ],
+    "project_default_csv_source_id": null,
+    "project_default_sqlite_source_id": null,
+    "project_default_pgsql_source_id": 1,
+    "project_default_oracle_source_id": null,
+    "project_default_mssql_source_id": null,
+    "configured_project": {
+        "id": 1,
+        "name": "Demo",
+        "slug": "easyit-project-demo",
+        "database": "easyit_project_demo",
+        "created": false
+    },
+    "bundled_project": null,
+    "health": {
+        "ready": true,
+        "checks": {
+            "php": {
+                "ok": true,
+                "detail": "8.2.12"
+            },
+            "ext_json": {
+                "ok": true,
+                "detail": "json"
+            },
+            "ext_pdo": {
+                "ok": true,
+                "detail": "pdo"
+            },
+            "ext_openssl": {
+                "ok": true,
+                "detail": "openssl"
+            },
+            "storage": {
+                "ok": true,
+                "detail": "D:/xampp/htdocs/enterpriseManager/DataForm5-Core/storage"
+            },
+            "env": {
+                "ok": true,
+                "detail": ".env"
+            },
+            "database": {
+                "ok": true,
+                "detail": "schema ready"
+            }
+        },
+        "checked_at": "2026-09-15T12:14:14+02:00"
+    }
+}

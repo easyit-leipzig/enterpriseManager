@@ -69,6 +69,7 @@ final class ProjectAssistant implements AssistantInterface
                 'fields' => [
                     ['name' => 'profile_name', 'label' => 'Profilname', 'type' => 'text', 'required' => true, 'default' => 'main'],
                     ['name' => 'database_name', 'label' => 'Datenbankname (MySQL / PostgreSQL / MSSQL)', 'type' => 'text'],
+                    ['name' => 'schema_name', 'label' => 'PostgreSQL-Schema', 'type' => 'text', 'default' => 'public'],
                 ],
             ]),
             new AssistantStep('structure', '4. Projektstruktur', 'Abgeleitete Verzeichnisse und lokale Datenpfade prüfen.'),
@@ -188,9 +189,11 @@ final class ProjectAssistant implements AssistantInterface
         if ($stepId === 'datasource') {
             $database = trim((string) $context->input('database_name', ''));
             if ($database === '' && in_array(($d['storage']['driver'] ?? ''), ['mysql','pgsql','mssql'], true)) { $database = (string) ($d['identity']['slug'] ?? ''); }
+            $schema = ($d['storage']['driver'] ?? '') === 'pgsql' ? (trim((string)$context->input('schema_name', 'public')) ?: 'public') : '';
             return $this->derivePaths($draft->merge(['dataSource' => [
                 'profileName' => trim((string) $context->input('profile_name', 'main')) ?: 'main',
                 'databaseName' => $database,
+                'schemaName' => $schema,
             ]]));
         }
         if ($stepId === 'provision') {
@@ -213,11 +216,13 @@ final class ProjectAssistant implements AssistantInterface
         };
         $database = (string) ($d['dataSource']['databaseName'] ?? '');
         if (in_array($driver, ['mysql','pgsql','mssql'], true) && $database === '') { $database = $slug; }
+        $schema = $driver === 'pgsql' ? (trim((string)($d['dataSource']['schemaName'] ?? 'public')) ?: 'public') : '';
         return $draft->merge([
             'storage' => ['projectPath' => $projectPath, 'dataMode' => $dataMode],
             'dataSource' => [
                 'driver' => $driver,
                 'databaseName' => $database,
+                'schemaName' => $schema,
                 'localPath' => $localPath,
                 'requiresConnectionConfiguration' => in_array($driver, ['mysql', 'pgsql', 'oracle', 'mssql'], true),
             ],
@@ -240,7 +245,7 @@ final class ProjectAssistant implements AssistantInterface
                 'project_name' => $d['identity']['name'], 'project_slug' => $d['identity']['slug'], 'description' => $d['identity']['description'],
             ],
             'storage' => ['driver' => $d['storage']['driver']],
-            'datasource' => ['profile_name' => $d['dataSource']['profileName'], 'database_name' => $d['dataSource']['databaseName']],
+            'datasource' => ['profile_name' => $d['dataSource']['profileName'], 'database_name' => $d['dataSource']['databaseName'], 'schema_name' => $d['dataSource']['schemaName'] ?? 'public'],
             'provision' => ['confirm_create' => $d['provision']['confirmCreate']],
             default => [],
         };

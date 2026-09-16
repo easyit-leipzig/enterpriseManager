@@ -1394,12 +1394,23 @@ try {
         </div>
     </header>
 
+    <section class="df-primary-actions" aria-label="Schnellzugriff Tabellen und Formulare">
+        <a class="df-primary-action" href="?project=<?= (int)$project['id'] ?>&amp;section=tables&amp;table_source=system#new-table">
+            <span class="df-primary-action-number">1</span>
+            <span><strong>Tabelle anlegen</strong><small>Projekt-Datenbank strukturieren und Felder definieren.</small></span>
+        </a>
+        <a class="df-primary-action" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms#new-dataform">
+            <span class="df-primary-action-number">2</span>
+            <span><strong>Formular anlegen</strong><small>Formular (DataForm) neu erstellen oder aus einer Tabelle ableiten.</small></span>
+        </a>
+    </section>
+
     <nav class="df-menu" aria-label="Workspace-Menü" data-df-menu>
         <details class="df-menu-item">
             <summary>Datei</summary>
             <div class="df-menu-dropdown" role="menu" aria-label="Datei">
-                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms#new-dataform">Neues DataForm …</a>
-                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">DataForms öffnen</a>
+                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms#new-dataform">Neues Formular …</a>
+                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">Formulare öffnen</a>
                 <?php if ($selectedDataformId > 0): ?>
                 <a role="menuitem" href="import.php?project=<?= (int)$project['id'] ?>&amp;dataform=<?= (int)$selectedDataformId ?>">CSV in aktuelles DataForm importieren …</a>
                 <?php endif; ?>
@@ -1423,7 +1434,7 @@ try {
                 <a role="menuitem" href="workflow.php?project=<?= (int)$project['id'] ?>&amp;dataform=<?= (int)$selectedDataformId ?>">Workflow …</a>
                 <a role="menuitem" href="relations.php?project=<?= (int)$project['id'] ?>&amp;dataform=<?= (int)$selectedDataformId ?>">Beziehungen …</a>
                 <?php else: ?>
-                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">DataForm zum Bearbeiten auswählen …</a>
+                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">Formular zum Bearbeiten auswählen …</a>
                 <?php endif; ?>
                 <div class="df-menu-separator" role="separator"></div>
                 <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=sources">Datenquellen …</a>
@@ -1435,7 +1446,7 @@ try {
             <summary>Ansicht</summary>
             <div class="df-menu-dropdown" role="menu" aria-label="Ansicht">
                 <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=welcome">Workspace-Übersicht</a>
-                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">DataForm-Liste</a>
+                <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">Formular-Liste</a>
                 <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=sources">Datenquellen</a>
                 <a role="menuitem" href="?project=<?= (int)$project['id'] ?>&amp;section=tables">Tabellen</a>
                 <?php if ($selectedDataformId > 0): ?>
@@ -1543,10 +1554,14 @@ try {
                         </dl>
                     </section>
                     <section class="card">
-                        <h3>Nächste Schritte</h3>
-                        <ol><li><a href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">Erstes DataForm anlegen</a>.</li><li>Datenquelle und Tabelle auswählen.</li><li>Felder im Designer konfigurieren.</li></ol>
+                        <h3>So bauen Sie das Projekt auf</h3>
+                        <ol>
+                            <li><a href="?project=<?= (int)$project['id'] ?>&amp;section=tables&amp;table_source=system#new-table">Tabelle anlegen</a> und die benötigten Spalten definieren.</li>
+                            <li><a href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms#table-dataforms">Formular aus der Tabelle erzeugen</a> oder <a href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms#new-dataform">ein leeres Formular anlegen</a>.</li>
+                            <li>Felder im Formular-Designer konfigurieren und anschließend die Datensätze testen.</li>
+                        </ol>
                     </section>
-                <?php elseif ($sectionKey === 'sources'): $sourceCfg=$selectedSource?DataSourceManager::config($selectedSource):[]; $sourceDriver=(string)($selectedSource['driver']??'mysql'); $systemDriver=enterprise_project_store_driver($env,$project); $systemDriverLabel=['mysql'=>'MySQL / MariaDB','pgsql'=>'PostgreSQL','sqlite'=>'SQLite','csv'=>'CSV'][$systemDriver]??strtoupper($systemDriver); ?>
+                <?php elseif ($sectionKey === 'sources'): $sourceCfg=$selectedSource?DataSourceManager::config($selectedSource):[]; $sourceDriver=(string)($selectedSource['driver']??'mysql'); $sourceDriverOptions=DataSourceManager::drivers(); $sourceDriverLabels=DataSourceManager::drivers(false); $systemDriver=enterprise_project_store_driver($env,$project); $systemDriverLabel=['mysql'=>'MySQL / MariaDB','pgsql'=>'PostgreSQL','sqlite'=>'SQLite','csv'=>'CSV'][$systemDriver]??strtoupper($systemDriver); ?>
                     <div class="df-toolbar">
                         <div><h2>Datenquellen</h2><p>Externe und dateibasierte Datenquellen projektbezogen konfigurieren, sicher speichern und direkt testen.</p></div>
                         <a class="button" href="?project=<?= (int)$project['id'] ?>&amp;section=sources#source-form">+ Neue Datenquelle</a>
@@ -1558,6 +1573,7 @@ try {
                             <div><dt>Treiber</dt><dd><?= e($systemDriverLabel) ?></dd></div>
                             <div><dt>Speicher</dt><dd><code><?= e((string)$project['database_name']) ?></code></dd></div>
                             <?php if(in_array($systemDriver,['mysql','pgsql'],true)): ?><div><dt>Host</dt><dd><code><?= e((string)($env['PROJECT_DB_HOST']??'127.0.0.1')) ?>:<?= (int)($env['PROJECT_DB_PORT']??($systemDriver==='pgsql'?5432:3306)) ?></code></dd></div><?php endif; ?>
+                            <?php if($systemDriver==='pgsql'): ?><div><dt>Schema</dt><dd><code><?= e((string)($env['PROJECT_DB_SCHEMA']??'public')) ?></code></dd></div><?php endif; ?>
                         </dl>
                     </section>
 
@@ -1569,11 +1585,12 @@ try {
                                 <?php foreach($dataSources as $source): $cfg=DataSourceManager::config($source); $status=(string)($source['last_test_status']??'unknown'); ?>
                                 <article class="df-source-card <?= !$source['is_enabled']?'disabled':'' ?>">
                                     <div class="df-source-heading">
-                                        <div><h4><?= e((string)$source['name']) ?></h4><p><?= e(DataSourceManager::drivers()[(string)$source['driver']]??(string)$source['driver']) ?><?= !$source['is_enabled']?' · deaktiviert':'' ?></p></div>
+                                        <div><h4><?= e((string)$source['name']) ?></h4><p><?= e(DataSourceManager::drivers(false)[(string)$source['driver']]??(string)$source['driver']) ?><?= !$source['is_enabled']?' · deaktiviert':'' ?></p></div>
                                         <span class="df-source-status <?= e($status) ?>"><?= $status==='pass'?'PASS':($status==='fail'?'FAIL':'NICHT GETESTET') ?></span>
                                     </div>
                                     <p class="df-source-summary">
-                                    <?php if(in_array($source['driver'],['mysql','pgsql'],true)): ?><?= e((string)($cfg['host']??'')) ?>:<?= (int)($cfg['port']??($source['driver']==='pgsql'?5432:3306)) ?> / <code><?= e((string)($cfg['database']??'')) ?></code>
+                                    <?php if($source['driver']==='pgsql'): ?><?= e((string)($cfg['host']??'')) ?>:<?= (int)($cfg['port']??5432) ?> / <code><?= e((string)($cfg['database']??'')) ?></code> / Schema <code><?= e((string)($cfg['schema']??'public')) ?></code>
+                                    <?php elseif($source['driver']==='mysql'): ?><?= e((string)($cfg['host']??'')) ?>:<?= (int)($cfg['port']??3306) ?> / <code><?= e((string)($cfg['database']??'')) ?></code>
                                     <?php elseif($source['driver']==='oracle'): ?><?= e((string)($cfg['host']??'')) ?>:<?= (int)($cfg['port']??1521) ?> / <?= e((string)($cfg['service_name']??'')) ?>
                                     <?php elseif($source['driver']==='sqlite'): ?><code><?= e((string)($cfg['path']??'')) ?></code>
                                     <?php elseif($source['driver']==='csv'): ?><code><?= e((string)($cfg['base_path']??'')) ?>/<?= e((string)($cfg['database']??'')) ?></code>
@@ -1612,14 +1629,15 @@ try {
                                 <input type="hidden" name="action" value="save_source">
                                 <input type="hidden" name="source_id" value="<?= (int)($selectedSource['id']??0) ?>">
                                 <label><strong>Name</strong><input name="source_name" required maxlength="160" value="<?= e((string)($selectedSource['name']??'')) ?>" placeholder="z. B. ERP-Datenbank"></label>
-                                <label><strong>Typ</strong><select name="driver" data-source-driver><?php foreach(DataSourceManager::drivers() as $driver=>$caption): ?><option value="<?= e($driver) ?>" <?= $sourceDriver===$driver?'selected':'' ?>><?= e($caption) ?></option><?php endforeach; ?></select></label>
+                                <label><strong>Typ</strong><select name="driver" data-source-driver><?php if($selectedSource && !isset($sourceDriverOptions[$sourceDriver])): ?><option value="<?= e($sourceDriver) ?>" selected disabled><?= e((string)($sourceDriverLabels[$sourceDriver]??strtoupper($sourceDriver))) ?> · PDO-Treiber fehlt</option><?php endif; ?><?php foreach($sourceDriverOptions as $driver=>$caption): ?><option value="<?= e($driver) ?>" <?= $sourceDriver===$driver?'selected':'' ?>><?= e($caption) ?></option><?php endforeach; ?></select></label>
 
                                 <div data-source-driver-fields="mysql pgsql oracle">
                                     <div class="df-form-grid">
                                         <label><strong>Host</strong><input name="host" value="<?= e((string)($sourceCfg['host']??'127.0.0.1')) ?>"></label>
                                         <label><strong>Port</strong><input type="number" min="1" max="65535" name="port" value="<?= (int)($sourceCfg['port']??($sourceDriver==='oracle'?1521:($sourceDriver==='pgsql'?5432:3306))) ?>"></label>
                                         <label data-driver-only="mysql pgsql"><strong>Datenbank</strong><input name="database" value="<?= e((string)($sourceCfg['database']??'')) ?>"></label>
-                                        <label data-driver-only="mysql pgsql"><strong>Charset</strong><input name="charset" value="<?= e((string)($sourceCfg['charset']??'utf8mb4')) ?>"></label>
+                                        <label data-driver-only="pgsql"><strong>Schema</strong><input name="schema" value="<?= e((string)($sourceCfg['schema']??'public')) ?>" pattern="[A-Za-z][A-Za-z0-9_]{0,62}"><small>PostgreSQL verwendet die Kombination Datenbank + Schema.</small></label>
+                                        <label data-driver-only="mysql pgsql"><strong>Charset</strong><input name="charset" value="<?= e((string)($sourceCfg['charset']??($sourceDriver==='pgsql'?'UTF8':'utf8mb4'))) ?>"></label>
                                         <label data-driver-only="oracle"><strong>Service-Name</strong><input name="service_name" value="<?= e((string)($sourceCfg['service_name']??'XEPDB1')) ?>"></label>
                                         <label data-driver-only="oracle"><strong>Oracle-Charset</strong><input name="oracle_charset" value="<?= e((string)($sourceCfg['charset']??'AL32UTF8')) ?>"></label>
                                         <label data-driver-only="oracle" class="full"><strong>DSN (optional)</strong><input name="dsn" value="<?= e((string)($sourceCfg['dsn']??'')) ?>" placeholder="oci:dbname=//host:1521/service;charset=AL32UTF8"></label>
@@ -1650,8 +1668,9 @@ try {
                             var port=form.querySelector('input[name="port"]');
                             if(port && !port.dataset.touched) port.value=value==='oracle'?'1521':(value==='pgsql'?'5432':'3306');
                             var charset=form.querySelector('input[name="charset"]'); if(charset && !charset.dataset.touched) charset.value=value==='pgsql'?'UTF8':'utf8mb4';
+                            var schema=form.querySelector('input[name="schema"]'); if(schema && value==='pgsql' && !schema.dataset.touched && schema.value.trim()==='') schema.value='public';
                         }
-                        var port=form.querySelector('input[name="port"]');if(port)port.addEventListener('input',function(){port.dataset.touched='1';}); var charset=form.querySelector('input[name="charset"]');if(charset)charset.addEventListener('input',function(){charset.dataset.touched='1';});
+                        var port=form.querySelector('input[name="port"]');if(port)port.addEventListener('input',function(){port.dataset.touched='1';}); var charset=form.querySelector('input[name="charset"]');if(charset)charset.addEventListener('input',function(){charset.dataset.touched='1';}); var schema=form.querySelector('input[name="schema"]');if(schema)schema.addEventListener('input',function(){schema.dataset.touched='1';});
                         driver.addEventListener('change',sync);sync();
                         form.querySelectorAll('[data-password-toggle]').forEach(function(button){button.addEventListener('click',function(){var input=button.parentElement.querySelector('input');var visible=input.type==='text';input.type=visible?'password':'text';button.setAttribute('aria-label','Kennwort anzeigen oder verbergen');});});
                     })();
@@ -1660,9 +1679,12 @@ try {
                     <div class="df-toolbar">
                         <div>
                             <h2>Tabellen</h2>
-                            <p>Physische Tabellen der internen Projekt-Datenbank und der aktivierten Datenquellen untersuchen.</p>
+                            <p>Tabellen anlegen, Struktur bearbeiten und vorhandene Tabellen der Projekt-Datenbank oder aktivierter Datenquellen untersuchen.</p>
                         </div>
-                        <a class="button secondary" <?= easyit_button_attributes('aktualisieren') ?> href="?project=<?= (int)$project['id'] ?>&amp;section=tables&amp;table_source=<?= e($tableSourceKey) ?>">↻ Aktualisieren</a>
+                        <div class="actions">
+                            <?php if($tableSourceKey==='system'): ?><a class="df-visible-action-link" href="#new-table">+ Tabelle anlegen</a><?php endif; ?>
+                            <a class="button secondary" <?= easyit_button_attributes('aktualisieren') ?> href="?project=<?= (int)$project['id'] ?>&amp;section=tables&amp;table_source=<?= e($tableSourceKey) ?>">↻ Aktualisieren</a>
+                        </div>
                     </div>
 
                     <?php if($tableError): ?>
@@ -1681,7 +1703,7 @@ try {
                                 <select name="table_source" onchange="this.form.submit()">
                                     <?php foreach($tableSources as $tableSource): ?>
                                     <option value="<?= e((string)$tableSource['key']) ?>" <?= $tableSourceKey===(string)$tableSource['key']?'selected':'' ?>>
-                                        <?= e((string)$tableSource['name']) ?> · <?= e(DataSourceManager::drivers()[(string)$tableSource['driver']]??(string)$tableSource['driver']) ?>
+                                        <?= e((string)$tableSource['name']) ?> · <?= e(DataSourceManager::drivers(false)[(string)$tableSource['driver']]??(string)$tableSource['driver']) ?>
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -1940,6 +1962,7 @@ try {
                                         class="df-column-form"
                                         data-auto-increment-column="<?= e($tableAutoIncrementColumn) ?>"
                                         data-original-column="<?= e((string)($selectedColumn['name']??'')) ?>"
+                                        data-driver="<?= e((string)($projectDriver??'mysql')) ?>"
                                     >
                                         <input type="hidden" name="csrf" value="<?= e(enterprise_csrf()) ?>">
                                         <input type="hidden" name="project" value="<?= (int)$project['id'] ?>">
@@ -1963,7 +1986,7 @@ try {
                                                     <option value="bigint">
                                                     <option value="decimal(12,2)">
                                                     <option value="date">
-                                                    <option value="datetime">
+                                                    <?php if(($projectDriver??'mysql')!=='pgsql'): ?><option value="datetime"><?php endif; ?>
                                                     <option value="timestamp">
                                                     <option value="boolean">
                                                 </datalist>
@@ -2006,10 +2029,12 @@ try {
                                                 <strong>Extra</strong>
                                                 <?php $selectedExtras=(array)($selectedColumn['editable_extras']??[]); ?>
                                                 <select name="column_extra[]" multiple size="4" class="df-multi-select" data-column-extra>
+                                                    <?php if(($projectDriver??'mysql')!=='pgsql'): ?>
                                                     <option value="unsigned" <?= in_array('unsigned',$selectedExtras,true)?'selected':'' ?>>UNSIGNED</option>
                                                     <option value="zerofill" <?= in_array('zerofill',$selectedExtras,true)?'selected':'' ?>>ZEROFILL</option>
                                                     <option value="auto_increment" <?= in_array('auto_increment',$selectedExtras,true)?'selected':'' ?>>AUTO_INCREMENT</option>
-                                                    <option value="on_update_current_timestamp" <?= in_array('on_update_current_timestamp',$selectedExtras,true)?'selected':'' ?>>ON UPDATE CURRENT_TIMESTAMP</option>
+                                                    <?php endif; ?>
+                                                    <option value="on_update_current_timestamp" <?= in_array('on_update_current_timestamp',$selectedExtras,true)?'selected':'' ?>>ON UPDATE CURRENT_TIMESTAMP<?= ($projectDriver??'mysql')==='pgsql'?' (Trigger)':'' ?></option>
                                                 </select>
                                             </label>
                                         </div>
@@ -2031,6 +2056,13 @@ try {
 
                                         <p class="df-field-help">
                                             Mehrfachauswahl bei <strong>Extra</strong> mit Strg/Ctrl bzw. Cmd.
+                                            <?php if(($projectDriver??'mysql')==='pgsql'): ?>
+                                            PostgreSQL besitzt keinen eigenen Typ <code>DATETIME</code>; DataForm verwendet dafür <code>TIMESTAMP</code>.
+                                            <code>CURRENT_TIMESTAMP</code> ist als Vorgabewert für <code>TIMESTAMP</code> zulässig.
+                                            <code>ON UPDATE CURRENT_TIMESTAMP</code> wird bei PostgreSQL durch einen verwalteten Trigger umgesetzt.
+                                            Zulässige Typen: <code>varchar(n)</code>, <code>text</code>, <code>int</code>, <code>bigint</code>,
+                                            <code>decimal(p,s)</code>, <code>date</code>, <code>timestamp</code>, <code>boolean</code>.
+                                            <?php else: ?>
                                             Extra-Regeln:
                                             <code>UNSIGNED</code>/<code>ZEROFILL</code> nur numerisch,
                                             <code>AUTO_INCREMENT</code> nur INT/BIGINT und nur einmal je Tabelle,
@@ -2039,6 +2071,7 @@ try {
                                             <code>varchar(n)</code>, <code>text</code>, <code>int</code>,
                                             <code>bigint</code>, <code>decimal(p,s)</code>, <code>date</code>,
                                             <code>datetime</code>, <code>timestamp</code>, <code>boolean</code>.
+                                            <?php endif; ?>
                                         </p>
                                         <button class="button" <?= easyit_button_attributes($selectedColumn?'speichern':'neu') ?> type="submit"><?= $selectedColumn?'Feld speichern':'Feld anlegen' ?></button>
                                     </form>
@@ -2108,8 +2141,8 @@ try {
                             <?php endif; ?>
 
                             <?php if($tableSourceKey==='system'): ?>
-                            <section class="card df-create-table">
-                                <h3>Neue Projekttabelle</h3>
+                            <section class="card df-create-table" id="new-table">
+                                <h3>Neue Projekttabelle anlegen</h3>
                                 <p>Tabellen, die hier angelegt werden, werden als DataForm-verwaltet registriert und können später kontrolliert wieder gelöscht werden.</p>
                                 <form method="post">
                                     <input type="hidden" name="csrf" value="<?= e(enterprise_csrf()) ?>">
@@ -2136,8 +2169,8 @@ try {
                                 </form>
                             </section>
                             <?php elseif($tableSourceIsCsv): ?>
-                            <section class="card df-create-table">
-                                <h3>Neue CSV-Tabelle</h3>
+                            <section class="card df-create-table" id="new-table">
+                                <h3>Neue CSV-Tabelle anlegen</h3>
                                 <p>Die CSV-Engine legt im Datenbankordner eine neue <code>.csv</code>-Datei an. <code>id</code> wird automatisch als erste Pflichtspalte erzeugt.</p>
                                 <form method="post">
                                     <input type="hidden" name="csrf" value="<?= e(enterprise_csrf()) ?>">
@@ -2162,8 +2195,8 @@ try {
                     </div>
                 <?php elseif ($sectionKey === 'dataforms'): ?>
                     <div class="df-toolbar">
-                        <div><h2>DataForms</h2><p>DataForms dieses Projekts öffnen, löschen und neu anlegen.</p></div>
-                        <a class="button" <?= easyit_button_attributes('neu','dataform') ?> href="#new-dataform">Neues DataForm</a>
+                        <div><h2>Formulare (DataForms)</h2><p>Formulare dieses Projekts öffnen, gestalten, löschen und neu anlegen.</p></div>
+                        <a class="df-visible-action-link" href="#new-dataform">+ Formular anlegen</a>
                     </div>
 
                     <?php if ($dataforms): ?>
@@ -2206,14 +2239,14 @@ try {
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
-                        <div class="empty-state"><h3>Noch keine DataForms</h3><p>Legen Sie das erste DataForm für dieses Projekt an.</p></div>
+                        <div class="empty-state"><h3>Noch keine Formulare</h3><p>Legen Sie das erste Formular (DataForm) für dieses Projekt an oder erzeugen Sie es aus einer Projekttabelle.</p></div>
                     <?php endif; ?>
 
                     <?php if($unboundManagedTables): ?>
                     <section class="card" id="table-dataforms">
                         <div class="df-toolbar">
                             <div>
-                                <h3>DataForm aus Projekttabelle erzeugen</h3>
+                                <h3>Formular aus Projekttabelle erzeugen</h3>
                                 <p>Die Felddefinition wird aus der realen Tabelle übernommen. Datensätze werden anschließend direkt in dieser Tabelle gelesen und geschrieben.</p>
                             </div>
                             <a class="button secondary" href="relations.php?project=<?= (int)$project['id'] ?>">Beziehungen</a>
@@ -2224,7 +2257,7 @@ try {
                                 method="post"
                                 action="?project=<?= (int)$project['id'] ?>&amp;section=dataforms"
                                 class="df-table-dataform-item"
-                                onsubmit="return confirm('DataForm direkt aus der Projekttabelle <?= e((string)$managedTable) ?> erzeugen?');"
+                                onsubmit="return confirm('Formular direkt aus der Projekttabelle <?= e((string)$managedTable) ?> erzeugen?');"
                             >
                                 <input type="hidden" name="csrf" value="<?= e(enterprise_csrf()) ?>">
                                 <input type="hidden" name="action" value="create_dataform_from_table">
@@ -2232,7 +2265,7 @@ try {
                                 <input type="hidden" name="section" value="dataforms">
                                 <input type="hidden" name="table" value="<?= e((string)$managedTable) ?>">
                                 <strong><code><?= e((string)$managedTable) ?></code></strong>
-                                <button class="button" type="submit">DataForm erzeugen</button>
+                                <button class="button" type="submit">Formular erzeugen</button>
                             </form>
                             <?php endforeach; ?>
                         </div>
@@ -2240,7 +2273,7 @@ try {
                     <?php endif; ?>
 
                     <section class="card" id="new-dataform">
-                        <h3>Neues DataForm anlegen</h3>
+                        <h3>Neues Formular (DataForm) anlegen</h3>
                         <form method="post" action="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">
                             <input type="hidden" name="csrf" value="<?= e(enterprise_csrf()) ?>">
                             <input type="hidden" name="action" value="create_dataform">
@@ -2249,15 +2282,15 @@ try {
                             <div class="df-form-grid">
                                 <label><strong>Name</strong><input name="name" required maxlength="160" placeholder="z. B. Kunden"></label>
                                 <label><strong>Interner Name</strong><input name="slug" maxlength="160" placeholder="z. B. kunden"><small>Optional; wird andernfalls aus dem Namen erzeugt.</small></label>
-                                <label class="full"><strong>Beschreibung</strong><textarea name="description" rows="4" placeholder="Wofür wird dieses DataForm verwendet?"></textarea></label>
+                                <label class="full"><strong>Beschreibung</strong><textarea name="description" rows="4" placeholder="Wofür wird dieses Formular verwendet?"></textarea></label>
                             </div>
-                            <p><button class="button" type="submit">DataForm anlegen</button></p>
+                            <p><button class="button" type="submit">Formular anlegen</button></p>
                         </form>
                     </section>
                 <?php elseif (in_array($sectionKey, ['dataform','designer'], true) && $selectedDataform): ?>
                     <div class="df-toolbar">
                         <div><h2><?= e((string)$selectedDataform['name']) ?></h2><p><?= e((string)($selectedDataform['description'] ?: 'Formular gestalten und Felder verwalten.')) ?></p></div>
-                        <a class="button secondary" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">Zur DataForm-Liste</a>
+                        <a class="button secondary" href="?project=<?= (int)$project['id'] ?>&amp;section=dataforms">Zur Formular-Liste</a>
                     </div>
                     <?= dataform_config_map((int)$project['id'], (int)$selectedDataform['id'], $sectionKey === 'designer' ? 'designer' : 'settings') ?>
                     <?php if ($sectionKey === 'designer'): ?>
@@ -2494,7 +2527,7 @@ try {
                                 <label><strong>Name</strong><input name="name" required maxlength="160" value="<?= e((string)$selectedDataform['name']) ?>"></label>
                                 <label><strong>Interner Name</strong><input name="slug" required maxlength="160" pattern="[a-z0-9-]+" value="<?= e((string)$selectedDataform['slug']) ?>"><small>Stabiler technischer Bezeichner für Runtime und Anwenderexport.</small></label>
                                 <label><strong>Status</strong><select name="status"><?php foreach(['draft'=>'Entwurf','active'=>'aktiv','inactive'=>'inaktiv','published'=>'veröffentlicht','archived'=>'archiviert'] as $statusValue=>$statusLabel): ?><option value="<?= e($statusValue) ?>" <?= (string)$selectedDataform['status']===$statusValue?'selected':'' ?>><?= e($statusLabel) ?></option><?php endforeach; ?></select></label>
-                                <label class="full"><strong>Beschreibung</strong><textarea name="description" rows="4" placeholder="Wofür wird dieses DataForm verwendet?"><?= e((string)($selectedDataform['description'] ?? '')) ?></textarea></label>
+                                <label class="full"><strong>Beschreibung</strong><textarea name="description" rows="4" placeholder="Wofür wird dieses Formular verwendet?"><?= e((string)($selectedDataform['description'] ?? '')) ?></textarea></label>
                               </div></fieldset>
 
                               <fieldset class="df-setting-group" id="settings-view"><legend>2 · Darstellung</legend><p class="muted">Bestimmt die Runtime-Ansicht. Struktur und Gruppen werden im <a href="foundation.php?project=<?= (int)$project['id'] ?>&amp;dataform=<?= (int)$selectedDataform['id'] ?>&amp;mode=layout">Layout</a>, Feldbreiten im <a href="?project=<?= (int)$project['id'] ?>&amp;section=designer&amp;dataform=<?= (int)$selectedDataform['id'] ?>">Formular-Designer</a> gepflegt.</p><div class="df-form-grid">
@@ -2656,7 +2689,7 @@ try {
             <div class="df-pane-title">Eigenschaften &amp; Hilfe</div>
             <section><h3>Aktuelle Auswahl</h3><strong><?= e($section['title']) ?></strong><p><?= e($section['text']) ?></p></section>
             <section><h3>Projekt</h3><dl><div><dt>Status</dt><dd><?= e((string)$project['status']) ?></dd></div><div><dt>Produkt</dt><dd>DataForm</dd></div><div><dt>Datenbank</dt><dd><?= $dbConnected ? 'verbunden' : 'Fehler' ?></dd></div></dl></section>
-            <section><h3>Kontexthilfe</h3><p><?= $sectionKey === 'dataforms' ? 'Legen Sie DataForms an, öffnen Sie sie zur Bearbeitung oder löschen Sie sie kontrolliert. Beim Löschen werden abhängige DataForm-Strukturen bereinigt.' : ($sectionKey === 'sources' ? 'Legen Sie projektbezogene Datenquellen an und prüfen Sie jede Verbindung mit „Verbindung testen“.' : ($sectionKey === 'tables' ? 'Wählen Sie eine Datenquelle und anschließend eine Tabelle. Aus einer DataForm-verwalteten Projekttabelle kann direkt ein zugehöriges DataForm mit automatisch abgeleiteten Feldern erzeugt werden; externe Quellen bleiben lesend geschützt.' : 'Wählen Sie links einen Bereich aus. In der Mitte öffnet sich der zugehörige Arbeitsbereich.')) ?></p></section>
+            <section><h3>Kontexthilfe</h3><p><?= $sectionKey === 'dataforms' ? 'Legen Sie Formulare (DataForms) an, öffnen Sie sie zur Bearbeitung oder löschen Sie sie kontrolliert. Formulare können leer angelegt oder direkt aus einer Projekttabelle erzeugt werden.' : ($sectionKey === 'sources' ? 'Legen Sie projektbezogene Datenquellen an und prüfen Sie jede Verbindung mit „Verbindung testen“.' : ($sectionKey === 'tables' ? 'Wählen Sie eine Datenquelle und anschließend eine Tabelle. Aus einer DataForm-verwalteten Projekttabelle kann direkt ein zugehöriges DataForm mit automatisch abgeleiteten Feldern erzeugt werden; externe Quellen bleiben lesend geschützt.' : 'Wählen Sie links einen Bereich aus. In der Mitte öffnet sich der zugehörige Arbeitsbereich.')) ?></p></section>
         </aside>
     </div>
 
@@ -2971,6 +3004,7 @@ html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI
 
         var tableAutoIncrementColumn=form.getAttribute('data-auto-increment-column')||'';
         var originalColumn=form.getAttribute('data-original-column')||'';
+        var driver=(form.getAttribute('data-driver')||'mysql').toLowerCase();
 
         function typeState(){
             var type=typeInput.value.trim().toLowerCase();
@@ -3022,19 +3056,24 @@ html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI
 
             setExtraAvailability(
                 'unsigned',
-                state.numeric,
-                'UNSIGNED wurde entfernt: nur numerische Datentypen unterstützen diese Eigenschaft.',
+                driver!=='pgsql' && state.numeric,
+                driver==='pgsql'
+                    ? 'UNSIGNED wurde entfernt: PostgreSQL unterstützt diese MySQL-Eigenschaft nicht.'
+                    : 'UNSIGNED wurde entfernt: nur numerische Datentypen unterstützen diese Eigenschaft.',
                 messages
             );
             setExtraAvailability(
                 'zerofill',
-                state.numeric,
-                'ZEROFILL wurde entfernt: nur numerische Datentypen unterstützen diese Eigenschaft.',
+                driver!=='pgsql' && state.numeric,
+                driver==='pgsql'
+                    ? 'ZEROFILL wurde entfernt: PostgreSQL unterstützt diese MySQL-Eigenschaft nicht.'
+                    : 'ZEROFILL wurde entfernt: nur numerische Datentypen unterstützen diese Eigenschaft.',
                 messages
             );
 
             var autoIncrementAvailable=
-                state.integer
+                driver!=='pgsql'
+                && state.integer
                 && !nullable.checked
                 && (
                     tableAutoIncrementColumn===''
@@ -3044,11 +3083,13 @@ html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI
             setExtraAvailability(
                 'auto_increment',
                 autoIncrementAvailable,
-                !state.integer
-                    ? 'AUTO_INCREMENT wurde entfernt: nur INT/BIGINT ist zulässig.'
-                    : nullable.checked
-                        ? 'AUTO_INCREMENT wurde entfernt: das Feld lässt NULL-Werte zu.'
-                        : 'AUTO_INCREMENT wurde entfernt: die Tabelle besitzt bereits ein anderes AUTO_INCREMENT-Feld.',
+                driver==='pgsql'
+                    ? 'AUTO_INCREMENT wurde entfernt: PostgreSQL verwendet Identity/Sequenzen.'
+                    : !state.integer
+                        ? 'AUTO_INCREMENT wurde entfernt: nur INT/BIGINT ist zulässig.'
+                        : nullable.checked
+                            ? 'AUTO_INCREMENT wurde entfernt: das Feld lässt NULL-Werte zu.'
+                            : 'AUTO_INCREMENT wurde entfernt: die Tabelle besitzt bereits ein anderes AUTO_INCREMENT-Feld.',
                 messages
             );
 

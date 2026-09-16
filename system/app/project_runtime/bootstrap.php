@@ -39,7 +39,7 @@ function df_pdo(): PDO {
     }
     if($driver==='pgsql'){
         if(!class_exists('EnterprisePgsqlPdo'))throw new RuntimeException('PostgreSQL-Kompatibilitätsklasse fehlt im Anwenderpaket.');
-        return $pdo=new EnterprisePgsqlPdo((string)$c['db_host'],(int)$c['db_port'],(string)$c['db_name'],(string)$c['db_user'],(string)$c['db_password']);
+        return $pdo=new EnterprisePgsqlPdo((string)$c['db_host'],(int)$c['db_port'],(string)$c['db_name'],(string)$c['db_user'],(string)$c['db_password'],(string)($c['db_schema']??'public'));
     }
     if($driver!=='mysql')throw new RuntimeException('Nicht unterstützter Projektdatenbanktreiber im Anwenderpaket: '.$driver);
     $dsn='mysql:host='.(string)$c['db_host'].';port='.(int)$c['db_port'].';dbname='.(string)$c['db_name'].';charset=utf8mb4';

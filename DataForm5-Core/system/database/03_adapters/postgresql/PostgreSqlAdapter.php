@@ -18,6 +18,15 @@ final class PostgreSqlAdapter extends AbstractPdoAdapter
         return "pgsql:host={$host};port={$port};dbname={$db}";
     }
 
+    public function connect(): void
+    {
+        if ($this->pdo instanceof \PDO) return;
+        parent::connect();
+        $schema=trim((string)($this->config['schema']??'public')) ?: 'public';
+        if(preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)!==1) throw new DatabaseException('Ungültiger PostgreSQL-Schemaname.');
+        $this->pdo?->exec('SET search_path TO "'.$schema.'"');
+    }
+
     public function tableExists(string $table): bool
     {
         $stmt=$this->connection()->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=current_schema() AND table_name=:table");

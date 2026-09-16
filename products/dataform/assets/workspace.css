@@ -341,3 +341,16 @@ body.dataform-runtime-page{background:var(--df-bg);color:var(--df-ink)}
 .records-table .df-record-pagination-row .pagination{margin:0;align-items:center}
 .records-table .df-record-pagination-row .df-pagination-status{color:var(--df-muted);white-space:nowrap}
 .records-table .df-master-preselected:disabled{opacity:1;color:#163a5f;background:#f3f7fb;cursor:not-allowed}
+
+
+/* Obvious authoring entry points. These are textual navigation cards by design;
+   CRUD image buttons remain registry-controlled. */
+.df-primary-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin:.8rem 0 1rem}
+.df-primary-action{display:flex;align-items:center;gap:.8rem;padding:.8rem 1rem;border:1px solid var(--df-line);border-radius:10px;background:#fff;color:var(--df-ink);text-decoration:none}
+.df-primary-action:hover{border-color:var(--df-brand);transform:translateY(-1px)}
+.df-primary-action-number{display:grid;place-items:center;flex:0 0 2.1rem;width:2.1rem;height:2.1rem;border-radius:999px;background:#eaf1fb;color:var(--df-brand);font-weight:900}
+.df-primary-action strong,.df-primary-action small{display:block}
+.df-primary-action small{margin-top:.15rem;color:var(--df-muted)}
+.df-visible-action-link{display:inline-flex;align-items:center;justify-content:center;min-height:2.5rem;padding:.55rem .8rem;border:1px solid var(--df-brand);border-radius:8px;color:var(--df-brand);font-weight:800;text-decoration:none;background:#fff}
+.df-visible-action-link:hover{background:#eaf1fb}
+@media(max-width:760px){.df-primary-actions{grid-template-columns:1fr}}

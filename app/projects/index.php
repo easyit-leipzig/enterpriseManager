@@ -8,6 +8,7 @@ $user = enterprise_require_auth('../../');
 enterprise_require_capability($user,'projects.view');
 $error = '';
 $projects = [];
+$env = enterprise_env(dirname(__DIR__, 2) . '/DataForm5-Core/.env');
 $flash = '';
 $flashType = 'success';
 $flashBackupToken = '';
@@ -19,6 +20,18 @@ try {
     $pdo = enterprise_pdo();
     enterprise_upgrade($pdo);
     $projects = $pdo->query('SELECT * FROM projects ORDER BY name')->fetchAll();
+    foreach ($projects as &$projectRow) {
+        try {
+            $projectDriver = enterprise_project_store_driver($env, $projectRow);
+            $projectRow['_store_driver'] = $projectDriver;
+            $projectRow['_store_exists'] = enterprise_project_store_exists($env, (string)$projectRow['database_name'], $projectDriver);
+        } catch (Throwable $storeError) {
+            $projectRow['_store_driver'] = enterprise_project_store_driver($env, $projectRow);
+            $projectRow['_store_exists'] = false;
+            $projectRow['_store_error'] = $storeError->getMessage();
+        }
+    }
+    unset($projectRow);
 
     if (isset($_SESSION['project_flash']) && is_array($_SESSION['project_flash'])) {
         $flash = trim((string)($_SESSION['project_flash']['message'] ?? ''));
@@ -43,6 +56,7 @@ render_breadcrumbs([
     <span class="badge"><?= enterprise_is_superadmin($user) ? 'Superadmin · Projektverwaltung' : 'Projektverwaltung' ?></span>
     <h1>Projekte</h1>
     <p>Alle easyIT-Projekte werden zentral verwaltet. <?= enterprise_is_superadmin($user) ? 'Sie sind als Superadministrator angemeldet und verfügen hier über die vollständige Projekt-CRUD-Verwaltung.' : 'Öffnen, bearbeiten und entfernen Sie Projekte entsprechend Ihrer Berechtigungen.' ?></p>
+    <p class="project-build-note"><strong>Tabellen und Formulare:</strong> Bei DataForm-Projekten können Sie diese direkt über die sichtbaren Schnellzugriffe in der Projektzeile anlegen oder verwalten.</p>
     <div class="actions">
         <a class="button" <?= easyit_button_attributes('neu','project') ?> data-button-fixed="1" data-crud="create" href="create.php">Neues Projekt anlegen</a>
         <a class="button secondary" <?= easyit_button_attributes('projekt_registrieren') ?> data-button-fixed="1" data-crud="create" href="register.php">Vorhandenes Projekt registrieren</a>
@@ -67,17 +81,25 @@ render_breadcrumbs([
 <?php endif; ?>
 
 <?php if ($error): ?>
-    <div class="notice error" role="alert"><?= e($error) ?></div>
+    <div class="notice error" role="alert">
+        <strong>Projektregister nicht verfügbar.</strong><br>
+        <?= e($error) ?>
+        <div class="actions" style="margin-top:1rem">
+            <a class="button" <?= easyit_button_attributes('einstellungen','setup') ?> href="../../setup.php">Setup durchführen</a>
+            <a class="button secondary" <?= easyit_button_attributes('datenbank_assistent') ?> href="../../installer/database.php">Datenbank-Assistent öffnen</a>
+            <a class="button secondary" <?= easyit_button_attributes('restore') ?> href="../../recovery.php">Recovery / Reset</a>
+        </div>
+    </div>
 <?php endif; ?>
 
-<?php if (!$projects): ?>
+<?php if (!$error && !$projects): ?>
     <div class="empty-state">
         <h2>Noch keine Projekte</h2>
         <a class="button" <?= easyit_button_attributes('neu','project') ?> data-button-fixed="1" data-crud="create" href="create.php">Erstes Projekt vollständig anlegen</a>
         <a class="button secondary" <?= easyit_button_attributes('projekt_registrieren') ?> data-button-fixed="1" data-crud="create" href="register.php">Vorhandenes Projekt registrieren</a>
         <a class="button secondary" <?= easyit_button_attributes('restore') ?> data-button-fixed="1" data-crud="create" href="restore.php">Projektsicherung wiederherstellen</a>
     </div>
-<?php else: ?>
+<?php elseif (!$error): ?>
     <div class="table-wrap">
         <table class="project-table">
             <thead>
@@ -93,9 +115,22 @@ render_breadcrumbs([
             <tbody>
             <?php foreach ($projects as $p): ?>
                 <tr>
-                    <td><strong><?= e((string)$p['name']) ?></strong></td>
+                    <td>
+                        <strong><?= e((string)$p['name']) ?></strong>
+                        <?php if ((string)$p['product_type'] === 'dataform' && (!array_key_exists('_store_exists',$p) || $p['_store_exists'])): ?>
+                            <nav class="project-build-links" aria-label="Tabellen und Formulare für <?= e((string)$p['name']) ?>">
+                                <a href="../../products/dataform/runtime.php?project=<?= (int)$p['id'] ?>&amp;section=tables&amp;table_source=system#new-table">Tabelle anlegen</a>
+                                <a href="../../products/dataform/runtime.php?project=<?= (int)$p['id'] ?>&amp;section=dataforms#new-dataform">Formular anlegen</a>
+                            </nav>
+                        <?php endif; ?>
+                    </td>
                     <td><?= e((string)$p['product_type']) ?></td>
-                    <td><strong><?= e(strtoupper((string)($p['database_driver'] ?? 'mysql'))) ?></strong><br><code><?= e((string)$p['database_name']) ?></code></td>
+                    <td>
+                        <strong><?= e(strtoupper((string)($p['_store_driver'] ?? $p['database_driver'] ?? 'mysql'))) ?></strong><br>
+                        <code><?= e((string)$p['database_name']) ?></code>
+                        <?php if (($p['_store_driver'] ?? '') === 'pgsql'): ?><br><small>Schema: <code><?= e(enterprise_project_store_pgsql_schema($env)) ?></code></small><?php endif; ?>
+                        <?php if (array_key_exists('_store_exists',$p) && !$p['_store_exists']): ?><br><span class="status-pill">Speicher fehlt</span><?php endif; ?>
+                    </td>
                     <td><?= e((string)$p['status']) ?></td>
                     <td><?= e((string)$p['updated_at']) ?></td>
                     <td>
@@ -107,7 +142,10 @@ render_breadcrumbs([
                                 <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
                                 <button class="button" <?= easyit_button_attributes('exportieren','project_package') ?> data-button-fixed="1" type="submit">HTML5-App exportieren</button>
                             </form>
-                            <a class="button" <?= easyit_button_attributes('loeschen','project') ?> data-button-fixed="1" data-crud="delete" href="delete.php?id=<?= (int)$p['id'] ?>">Löschen</a>
+                            <?php if (array_key_exists('_store_exists',$p) && !$p['_store_exists']): ?>
+                                <a class="button" <?= easyit_button_attributes('neu','project_storage') ?> data-button-fixed="1" href="rebuild.php?id=<?= (int)$p['id'] ?>">Speicher neu aufbauen</a>
+                            <?php endif; ?>
+                            <a class="button" <?= easyit_button_attributes('loeschen','project') ?> data-button-fixed="1" data-crud="delete" href="delete.php?id=<?= (int)$p['id'] ?>">Projekt löschen</a>
                         </div>
                     </td>
                 </tr>
@@ -130,7 +168,7 @@ render_page([
         'location' => 'Enterprise → Projekte',
         'short' => 'Hier verwalten Sie alle registrierten easyIT-Projekte mit vollständigem CRUD.',
         'goal' => 'Projekt anlegen, öffnen, bearbeiten, als lauffähiges HTML5-App exportieren oder aus der Enterprise-Verwaltung entfernen.',
-        'next' => 'Projekt öffnen oder eine CRUD-Aktion in der Liste wählen.',
+        'next' => 'Bei einem DataForm-Projekt direkt „Tabelle anlegen“ oder „Formular anlegen“ wählen; alternativ das Projekt öffnen.',
         'tips' => [
             'Beim Löschen können Sie vorab eine vollständige Projektsicherung als Download erzeugen und entscheiden anschließend ausdrücklich, ob die Projektdatenbank erhalten bleibt oder zusätzlich endgültig gelöscht wird.',
             'Eine heruntergeladene Projektsicherung kann über „Projektsicherung wiederherstellen“ inklusive Datenbank und Projektregistrierung zurückgespielt werden.',

@@ -46,6 +46,8 @@ final class EnterpriseInstaller
         if(!in_array($adminDriver,['mysql','csv','sqlite','pgsql','oracle','mssql'],true)) throw new InstallerException('Administrationsspeicher wird nicht unterstützt: '.$adminDriver);
         $adminDatabase=trim((string)($db['database']??''));
         if(!preg_match('/^[A-Za-z][A-Za-z0-9_]{1,62}$/',$adminDatabase)) throw new InstallerException('Ungültiger Name für den Administrationsspeicher.');
+        $adminSchema=$adminDriver==='pgsql'?(trim((string)($db['schema']??'public')) ?: 'public'):'';
+        if($adminDriver==='pgsql' && !preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$adminSchema)) throw new InstallerException('Ungültiges PostgreSQL-Administrationsschema.');
 
         $projectDb=(array)($input['project_database']??[]);
         if($projectDb===[]){
@@ -55,7 +57,9 @@ final class EnterpriseInstaller
         if(!in_array($projectDriver,['mysql','csv','sqlite','pgsql','oracle','mssql'],true)) throw new InstallerException('Projektdatenspeicher wird nicht unterstützt: '.$projectDriver);
         $projectDatabase=trim((string)($projectDb['database']??'easyit_project_demo'));
         if(!preg_match('/^[A-Za-z][A-Za-z0-9_]{1,62}$/',$projectDatabase)) throw new InstallerException('Ungültiger Name für den Projektdatenspeicher.');
-        if($adminDriver===$projectDriver && $adminDatabase===$projectDatabase) throw new InstallerException('Administrations- und Projektspeicher müssen bei gleichem Treiber getrennte Namen besitzen.');
+        $projectPgSchema=$projectDriver==='pgsql'?(trim((string)($projectDb['schema']??'public')) ?: 'public'):'';
+        if($projectDriver==='pgsql' && !preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$projectPgSchema)) throw new InstallerException('Ungültiges PostgreSQL-Projektschema.');
+        if($adminDriver===$projectDriver && $adminDatabase===$projectDatabase && ($adminDriver!=='pgsql' || $adminSchema===$projectPgSchema)) throw new InstallerException('Administrations- und Projektspeicher müssen bei gleichem Treiber getrennte Datenbank-/Schema-Kombinationen besitzen.');
         if(($adminDriver==='mysql'||$projectDriver==='mysql')&&!extension_loaded('pdo_mysql')) throw new InstallerException('pdo_mysql fehlt, wird aber für den gewählten MariaDB/MySQL-Speicher benötigt.');
         if(($adminDriver==='pgsql'||$projectDriver==='pgsql')&&!extension_loaded('pdo_pgsql')) throw new InstallerException('pdo_pgsql fehlt, wird aber für den gewählten PostgreSQL-Speicher benötigt.');
         if(($adminDriver==='sqlite'||$projectDriver==='sqlite')&&!extension_loaded('pdo_sqlite')) throw new InstallerException('pdo_sqlite fehlt, wird aber für den gewählten SQLite-Speicher benötigt.');
@@ -95,7 +99,7 @@ final class EnterpriseInstaller
             $schema=$this->database->installSchema($pdo,$this->enterprisePath.'/installer/schema/admin');
         }elseif($adminDriver==='pgsql'){
             foreach(['host','port','username'] as $key)if(trim((string)($db[$key]??''))==='')throw new InstallerException("Admin-PostgreSQL-Konfiguration '{$key}' fehlt.");
-            $db['driver']='pgsql';$db['database']=$adminDatabase;$this->database->createDatabase($db);$pdo=$this->database->connect($db);
+            $db['driver']='pgsql';$db['database']=$adminDatabase;$db['schema']=$adminSchema;$db['maintenance_database']=trim((string)($db['maintenance_database']??'postgres')) ?: 'postgres';$this->database->createDatabase($db);$pdo=$this->database->connect($db);
             $schema=$this->database->installSchema($pdo,$this->enterprisePath.'/installer/schema/admin');
         }else{
             foreach(['host','port','username'] as $key)if(trim((string)($db[$key]??''))==='')throw new InstallerException("Admin-DB-Konfiguration '{$key}' fehlt.");
@@ -138,11 +142,11 @@ final class EnterpriseInstaller
             $projectDefaultOracleSourceId=\enterprise_project_store_ensure_default_oracle_source($projectPdo,['PROJECT_DB_HOST'=>(string)$projectDb['host'],'PROJECT_DB_PORT'=>(int)$projectDb['port'],'PROJECT_DB_ORACLE_SERVICE'=>(string)$projectDb['service'],'PROJECT_DB_USERNAME'=>(string)$projectDb['username']],$projectDatabase);
         }elseif($projectDriver==='pgsql'){
             foreach(['host','port','username'] as $key)if(trim((string)($projectDb[$key]??''))==='')throw new InstallerException("Projekt-PostgreSQL-Konfiguration '{$key}' fehlt.");
-            $projectDb['driver']='pgsql';$projectDb['database']=$projectDatabase;
+            $projectDb['driver']='pgsql';$projectDb['database']=$projectDatabase;$projectDb['schema']=$projectPgSchema;$projectDb['maintenance_database']=trim((string)($projectDb['maintenance_database']??'postgres')) ?: 'postgres';
             $this->database->createDatabase($projectDb);$projectPdo=$this->database->connect($projectDb);
             $projectSchema=$this->database->installSchema($projectPdo,$this->enterprisePath.'/installer/schema/project');
             require_once $this->enterprisePath.'/system/app/project_store.php';
-            $projectDefaultPgsqlSourceId=\enterprise_project_store_ensure_default_pgsql_source($projectPdo,['PROJECT_DB_HOST'=>(string)$projectDb['host'],'PROJECT_DB_PORT'=>(int)$projectDb['port'],'PROJECT_DB_USERNAME'=>(string)$projectDb['username']],$projectDatabase);
+            $projectDefaultPgsqlSourceId=\enterprise_project_store_ensure_default_pgsql_source($projectPdo,['PROJECT_DB_HOST'=>(string)$projectDb['host'],'PROJECT_DB_PORT'=>(int)$projectDb['port'],'PROJECT_DB_USERNAME'=>(string)$projectDb['username'],'PROJECT_DB_SCHEMA'=>$projectPgSchema],$projectDatabase);
         }else{
             foreach(['host','port','username'] as $key)if(trim((string)($projectDb[$key]??''))==='')throw new InstallerException("Projekt-DB-Konfiguration '{$key}' fehlt.");
             $projectDb['driver']='mysql';$projectDb['database']=$projectDatabase;
@@ -155,13 +159,24 @@ final class EnterpriseInstaller
             'DATAFORM_APP_KEY'=>'dfk1_'.rtrim(strtr(base64_encode(random_bytes(32)),'+/','-_'),'='),
             'ADMIN_DB_DRIVER'=>$adminDriver,'ADMIN_DB_CSV_BASE_PATH'=>$adminDriver==='csv'?$baseSetting:'','ADMIN_DB_SQLITE_BASE_PATH'=>$adminDriver==='sqlite'?$sqliteBaseSetting:'',
             'ADMIN_DB_HOST'=>in_array($adminDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($db['host']??''):'','ADMIN_DB_PORT'=>in_array($adminDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($db['port']??''):'',
-            'ADMIN_DB_DATABASE'=>$adminDatabase,'ADMIN_DB_USERNAME'=>in_array($adminDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($db['username']??''):'','ADMIN_DB_PASSWORD'=>in_array($adminDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($db['password']??''):'','ADMIN_DB_ORACLE_SERVICE'=>$adminDriver==='oracle'?(string)($db['service']??$db['service_name']??'XEPDB1'):'','ADMIN_DB_CHARSET'=>$adminDriver==='oracle'?'AL32UTF8':($adminDriver==='pgsql'?'UTF8':($adminDriver==='mssql'?'UTF-8':'utf8mb4')),'ADMIN_DB_ENCRYPT'=>$adminDriver==='mssql'?'true':'','ADMIN_DB_TRUST_SERVER_CERTIFICATE'=>$adminDriver==='mssql'?'false':'',
+            'ADMIN_DB_MAINTENANCE_DATABASE'=>$adminDriver==='pgsql'?(string)($db['maintenance_database']??'postgres'):'','ADMIN_DB_DATABASE'=>$adminDatabase,'ADMIN_DB_SCHEMA'=>$adminDriver==='pgsql'?$adminSchema:'','ADMIN_DB_USERNAME'=>in_array($adminDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($db['username']??''):'','ADMIN_DB_PASSWORD'=>in_array($adminDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($db['password']??''):'','ADMIN_DB_ORACLE_SERVICE'=>$adminDriver==='oracle'?(string)($db['service']??$db['service_name']??'XEPDB1'):'','ADMIN_DB_CHARSET'=>$adminDriver==='oracle'?'AL32UTF8':($adminDriver==='pgsql'?'UTF8':($adminDriver==='mssql'?'UTF-8':'utf8mb4')),'ADMIN_DB_ENCRYPT'=>$adminDriver==='mssql'?'true':'','ADMIN_DB_TRUST_SERVER_CERTIFICATE'=>$adminDriver==='mssql'?'false':'',
             'PROJECT_DB_DRIVER'=>$projectDriver,'PROJECT_DB_CSV_BASE_PATH'=>$projectDriver==='csv'?$projectBaseSetting:'','PROJECT_DB_SQLITE_BASE_PATH'=>$projectDriver==='sqlite'?$projectSqliteBaseSetting:'',
             'PROJECT_DB_HOST'=>in_array($projectDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($projectDb['host']??''):'','PROJECT_DB_PORT'=>in_array($projectDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($projectDb['port']??''):'',
-            'PROJECT_DB_DATABASE'=>$projectDatabase,'PROJECT_DB_USERNAME'=>in_array($projectDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($projectDb['username']??''):'','PROJECT_DB_PASSWORD'=>in_array($projectDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($projectDb['password']??''):'','PROJECT_DB_ORACLE_SERVICE'=>$projectDriver==='oracle'?(string)($projectDb['service']??$projectDb['service_name']??'XEPDB1'):'',
+            'PROJECT_DB_MAINTENANCE_DATABASE'=>$projectDriver==='pgsql'?(string)($projectDb['maintenance_database']??'postgres'):'','PROJECT_DB_DATABASE'=>$projectDatabase,'PROJECT_DB_SCHEMA'=>$projectDriver==='pgsql'?$projectPgSchema:'','PROJECT_DB_USERNAME'=>in_array($projectDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($projectDb['username']??''):'','PROJECT_DB_PASSWORD'=>in_array($projectDriver,['mysql','pgsql','oracle','mssql'],true)?(string)($projectDb['password']??''):'','PROJECT_DB_ORACLE_SERVICE'=>$projectDriver==='oracle'?(string)($projectDb['service']??$projectDb['service_name']??'XEPDB1'):'',
             'PROJECT_DB_CHARSET'=>$projectDriver==='oracle'?'AL32UTF8':($projectDriver==='pgsql'?'UTF8':($projectDriver==='mssql'?'UTF-8':'utf8mb4')),'PROJECT_DB_ENCRYPT'=>$projectDriver==='mssql'?'true':'','PROJECT_DB_TRUST_SERVER_CERTIFICATE'=>$projectDriver==='mssql'?'false':'','CACHE_STORE'=>'file','QUEUE_CONNECTION'=>'file','CLUSTER_ENABLED'=>'false','CLUSTER_SECURITY_ENABLED'=>'false','STORAGE_DISK'=>'local','REPLICATION_ENABLED'=>'false',
         ];
         $this->envWriter->write($env);
+
+        // Der im Installer vorbereitete Projektspeicher ist ein reales erstes
+        // Projekt und muss deshalb sofort im Enterprise-Projektregister
+        // erscheinen. Ohne diesen Eintrag existiert die Datenbank physisch,
+        // die Projekt-Startseite bleibt aber fälschlich leer.
+        $configuredProject=$this->registerConfiguredProject(
+            $pdo,
+            $projectDriver,
+            $projectDatabase,
+            (string)($input['project_name']??$projectDatabase)
+        );
 
         $userId=$this->database->createAdmin($pdo,(string)($admin['username']??''),(string)($admin['email']??''),(string)($admin['password']??''));
         $this->database->registerProducts($pdo,$products);
@@ -176,9 +191,12 @@ final class EnterpriseInstaller
             'admin_user_id'=>$userId,
             'database'=>$adminDatabase,
             'admin_store_driver'=>$adminDriver,
+            'admin_store_database'=>$adminDatabase,
+            'admin_store_schema'=>$adminDriver==='pgsql'?$adminSchema:null,
             'admin_store_path'=>$adminDriver==='csv'?$baseSetting:($adminDriver==='sqlite'?$sqliteBaseSetting:null),
             'project_store_driver'=>$projectDriver,
             'project_store_database'=>$projectDatabase,
+            'project_store_schema'=>$projectDriver==='pgsql'?$projectPgSchema:null,
             'project_store_path'=>$projectDriver==='csv'?$projectBaseSetting:($projectDriver==='sqlite'?$projectSqliteBaseSetting:null),
             'products'=>$products,
             'schema_files'=>$schema,
@@ -188,6 +206,7 @@ final class EnterpriseInstaller
             'project_default_pgsql_source_id'=>$projectDriver==='pgsql'?$projectDefaultPgsqlSourceId:null,
             'project_default_oracle_source_id'=>$projectDriver==='oracle'?$projectDefaultOracleSourceId:null,
             'project_default_mssql_source_id'=>$projectDriver==='mssql'?$projectDefaultMssqlSourceId:null,
+            'configured_project'=>$configuredProject,
             'bundled_project'=>$bundledProject,
             'health'=>$health,
         ];
@@ -204,6 +223,32 @@ final class EnterpriseInstaller
     {
         return ['installed'=>$this->lock->exists(),'lock'=>$this->lock->read(),'inspection'=>$this->inspect()];
     }
+    private function registerConfiguredProject(PDO $adminPdo,string $driver,string $database,string $name): array
+    {
+        $name=trim($name) ?: $database;
+        $check=$adminPdo->prepare('SELECT id,name,slug FROM projects WHERE database_driver=? AND database_name=? LIMIT 1');
+        $check->execute([$driver,$database]);
+        $existing=$check->fetch(PDO::FETCH_ASSOC);
+        if(is_array($existing)){
+            return ['id'=>(int)$existing['id'],'name'=>(string)$existing['name'],'slug'=>(string)$existing['slug'],'database'=>$database,'created'=>false];
+        }
+        $slug=strtolower(str_replace('_','-',$database));
+        $slug=preg_replace('/[^a-z0-9-]+/','-',$slug)??'';
+        $slug=trim($slug,'-');
+        if(strlen($slug)<2)$slug='project-'.substr(hash('sha256',$database),0,8);
+        $base=$slug;$suffix=2;
+        while(true){
+            $q=$adminPdo->prepare('SELECT id FROM projects WHERE slug=? LIMIT 1');
+            $q->execute([$slug]);
+            if($q->fetchColumn()===false)break;
+            $slug=$base.'-'.$suffix++;
+        }
+        $st=$adminPdo->prepare("INSERT INTO projects(name,slug,database_driver,database_name,status) VALUES (?,?,?,?,'active')");
+        $st->execute([$name,$slug,$driver,$database]);
+        $id=(int)$adminPdo->lastInsertId();
+        return ['id'=>$id,'name'=>$name,'slug'=>$slug,'database'=>$database,'created'=>true];
+    }
+
     private function installBundledProject(PDO $adminPdo,array $projectDb,string $adminDatabase): ?array
     {
         $bundleDir=$this->enterprisePath.'/distribution/project';

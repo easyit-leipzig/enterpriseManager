@@ -66,6 +66,11 @@ final class SchedulerServiceProvider implements ServiceProviderInterface
                     PDO::ATTR_EMULATE_PREPARES=>false,
                 ]
             );
+            if($driver==='pgsql'){
+                $schema=trim((string)($cfg['db_schema']??'public')) ?: 'public';
+                if(preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)!==1)throw new \RuntimeException('Ungültiger PostgreSQL-Schemaname für Scheduler-Mutex.');
+                $pdo->exec('SET search_path TO "'.$schema.'"');
+            }
 
             return new DatabaseMutex(
                 $pdo,

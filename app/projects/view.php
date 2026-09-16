@@ -11,6 +11,9 @@ $error = '';
 $project = null;
 $flash = '';
 $flashType = 'success';
+$storeExists = null;
+$storeDriver = '';
+$env = enterprise_env(dirname(__DIR__, 2) . '/DataForm5-Core/.env');
 
 try {
     $pdo = enterprise_pdo();
@@ -21,6 +24,8 @@ try {
     if (!$project) {
         throw new RuntimeException('Projekt nicht gefunden.');
     }
+    $storeDriver = enterprise_project_store_driver($env, $project);
+    $storeExists = enterprise_project_store_exists($env, (string)$project['database_name'], $storeDriver);
     $_SESSION['active_project_id'] = $id;
     if (isset($_SESSION['project_flash']) && is_array($_SESSION['project_flash'])) {
         $flash = trim((string)($_SESSION['project_flash']['message'] ?? ''));
@@ -51,13 +56,14 @@ ob_start();
         <p>Projekt-Dashboard und sicherer Übergang in die Produktoberfläche.</p>
         <div class="actions">
             <?php if ($productUrl !== ''): ?>
-                <a class="button" href="<?= e($productUrl) ?>">DataForm öffnen</a>
+                <a class="button" href="<?= e($productUrl) ?>">DataForm-Arbeitsbereich öffnen</a>
             <?php else: ?>
                 <span class="button secondary" aria-disabled="true">Produkt noch nicht verfügbar</span>
             <?php endif; ?>
             <form method="post" action="export.php" class="inline-form" style="display:inline"><input type="hidden" name="csrf" value="<?= e(enterprise_csrf()) ?>"><input type="hidden" name="id" value="<?= (int)$project['id'] ?>"><button class="button" <?= easyit_button_attributes('exportieren','project_package') ?> data-button-fixed="1" type="submit">HTML5-App exportieren</button></form>
-            <a class="button" data-crud="edit" href="edit.php?id=<?= (int)$project['id'] ?>">Bearbeiten</a>
-            <a class="button" data-crud="delete" href="delete.php?id=<?= (int)$project['id'] ?>">Löschen</a>
+            <a class="button" <?= easyit_button_attributes('bearbeiten','project') ?> data-crud="edit" href="edit.php?id=<?= (int)$project['id'] ?>">Bearbeiten</a>
+            <?php if ($storeExists === false): ?><a class="button" <?= easyit_button_attributes('neu','project_storage') ?> href="rebuild.php?id=<?= (int)$project['id'] ?>">Speicher neu aufbauen</a><?php endif; ?>
+            <a class="button" <?= easyit_button_attributes('loeschen','project') ?> data-crud="delete" href="delete.php?id=<?= (int)$project['id'] ?>">Projekt löschen</a>
             <a class="button secondary" href="index.php">Zur Projektliste</a>
         </div>
     </section>
@@ -68,10 +74,31 @@ ob_start();
         <div class="metric"><strong><?= e($project['database_driver']) ?></strong><span>Treiber</span></div>
     </div>
 
+    <?php if ((string)$project['product_type'] === 'dataform' && $storeExists !== false): ?>
+    <section class="card project-build-card">
+        <h2>Tabellen und Formulare</h2>
+        <p>Hier beginnen Sie den fachlichen Aufbau des Projekts. Der empfohlene Weg ist: zuerst eine Tabelle anlegen und daraus anschließend ein Formular erzeugen.</p>
+        <div class="project-builder-grid">
+            <a class="project-builder-tile" href="../../products/dataform/runtime.php?project=<?= (int)$project['id'] ?>&amp;section=tables&amp;table_source=system#new-table">
+                <span class="project-builder-step">1</span>
+                <strong>Tabelle anlegen</strong>
+                <span>Tabellenname und Spalten definieren oder vorhandene Tabellen verwalten.</span>
+            </a>
+            <a class="project-builder-tile" href="../../products/dataform/runtime.php?project=<?= (int)$project['id'] ?>&amp;section=dataforms#new-dataform">
+                <span class="project-builder-step">2</span>
+                <strong>Formular anlegen</strong>
+                <span>Ein Formular (DataForm) neu anlegen oder aus einer vorhandenen Projekttabelle erzeugen.</span>
+            </a>
+        </div>
+    </section>
+    <?php endif; ?>
+
     <section class="card">
         <h2>Projektverbindung</h2>
         <dl class="status-list">
             <div><dt>Datenbank</dt><dd><code><?= e($project['database_name']) ?></code></dd></div>
+            <?php if ($storeDriver === 'pgsql'): ?><div><dt>PostgreSQL-Schema</dt><dd><code><?= e(enterprise_project_store_pgsql_schema($env)) ?></code></dd></div><?php endif; ?>
+            <div><dt>Physischer Speicher</dt><dd><?= $storeExists === false ? 'fehlt' : 'vorhanden' ?></dd></div>
             <div><dt>Interner Projektname</dt><dd><code><?= e($project['slug']) ?></code></dd></div>
             <div><dt>Erstellt</dt><dd><?= e($project['created_at']) ?></dd></div>
         </dl>
@@ -92,7 +119,7 @@ render_page([
         'location' => 'Enterprise → Projekte → Projekt',
         'short' => 'Zentrale Übersicht des ausgewählten Projekts.',
         'goal' => 'Das zugeordnete Produkt öffnen oder Projektinformationen prüfen.',
-        'next' => 'Öffnen Sie DataForm über die Produktoberfläche.',
+        'next' => 'Wählen Sie „Tabelle anlegen“ oder „Formular anlegen“ im Bereich „Tabellen und Formulare“.',
         'tips' => [
             'Der Core wird niemals direkt als Benutzeroberfläche geöffnet.',
             'Zur Projektwahl gelangen Sie über „Zur Projektliste“.',

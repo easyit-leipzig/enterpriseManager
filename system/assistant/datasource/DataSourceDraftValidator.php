@@ -30,6 +30,11 @@ final class DataSourceDraftValidator
                 if (trim((string) ($c['host'] ?? '')) === '') { $errors[] = 'Host fehlt.'; }
                 if ((int) ($c['port'] ?? 0) < 1 || (int) ($c['port'] ?? 0) > 65535) { $errors[] = 'Port muss zwischen 1 und 65535 liegen.'; }
                 if (in_array($driver,['mysql','pgsql','mssql'],true) && trim((string) ($c['database'] ?? '')) === '') { $errors[] = 'Datenbankname fehlt.'; }
+                if ($driver === 'pgsql') {
+                    $schema = trim((string) ($c['schema'] ?? ''));
+                    if ($schema === '') { $errors[] = 'PostgreSQL-Schema fehlt.'; }
+                    elseif (preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/', $schema) !== 1) { $errors[] = 'Ungültiger PostgreSQL-Schemaname.'; }
+                }
                 if ($driver === 'oracle' && trim((string) ($c['service'] ?? '')) === '') { $errors[] = 'Oracle Service Name fehlt.'; }
                 if (trim((string) ($c['username'] ?? '')) === '') { $warnings[] = 'Kein Benutzername angegeben.'; }
             } elseif (in_array($driver, ['sqlite', 'csv'], true)) {

@@ -51,6 +51,9 @@ final class PostgreSqlDataSourceAdapter extends AbstractPdoAdapter implements Da
         $dsn=sprintf('pgsql:host=%s;port=%d;dbname=%s',(string)($c['host']??'127.0.0.1'),(int)($c['port']??5432),(string)($c['database']??''));
         $pdo=new \PDO($dsn,(string)($c['username']??''),(string)($c['password']??''),$this->options());
         $pdo->exec("SET client_encoding TO 'UTF8'");
+        $schema=trim((string)($c['schema']??'public')) ?: 'public';
+        if(preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)!==1)throw new \RuntimeException('Ungültiger PostgreSQL-Schemaname.');
+        $pdo->exec('SET search_path TO "'.$schema.'"');
         return $pdo;
     }
 }

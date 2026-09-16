@@ -7,6 +7,7 @@ return [
     'db_host' => getenv('SCHEDULER_DB_HOST') ?: (getenv('ADMIN_DB_HOST') ?: '127.0.0.1'),
     'db_port' => (int)(getenv('SCHEDULER_DB_PORT') ?: (getenv('ADMIN_DB_PORT') ?: 3306)),
     'db_database' => getenv('SCHEDULER_DB_DATABASE') ?: (getenv('ADMIN_DB_DATABASE') ?: ''),
+    'db_schema' => getenv('SCHEDULER_DB_SCHEMA') ?: (getenv('ADMIN_DB_SCHEMA') ?: 'public'),
     'db_username' => getenv('SCHEDULER_DB_USERNAME') ?: (getenv('ADMIN_DB_USERNAME') ?: ''),
     'db_password' => getenv('SCHEDULER_DB_PASSWORD') ?: (getenv('ADMIN_DB_PASSWORD') ?: ''),
     'node_id' => getenv('CLUSTER_NODE_ID') ?: (gethostname() ?: 'node-local'),

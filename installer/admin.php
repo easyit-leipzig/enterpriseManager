@@ -69,7 +69,7 @@ function admin_pdo(array $env): PDO
         foreach (['ADMIN_DB_HOST','ADMIN_DB_PORT','ADMIN_DB_DATABASE','ADMIN_DB_USERNAME'] as $key) {
             if (!isset($env[$key]) || trim((string)$env[$key])==='') throw new RuntimeException("Die Einstellung {$key} fehlt. Führen Sie zuerst Schritt 6 vollständig aus.");
         }
-        return new EnterprisePgsqlPdo((string)$env['ADMIN_DB_HOST'],(int)$env['ADMIN_DB_PORT'],(string)$env['ADMIN_DB_DATABASE'],(string)$env['ADMIN_DB_USERNAME'],(string)($env['ADMIN_DB_PASSWORD']??''));
+        return new EnterprisePgsqlPdo((string)$env['ADMIN_DB_HOST'],(int)$env['ADMIN_DB_PORT'],(string)$env['ADMIN_DB_DATABASE'],(string)$env['ADMIN_DB_USERNAME'],(string)($env['ADMIN_DB_PASSWORD']??''),(string)($env['ADMIN_DB_SCHEMA']??'public'));
     }
     if ($driver !== 'mysql' && $driver !== 'mariadb') throw new RuntimeException('Nicht unterstützter Administrationsspeicher: '.$driver);
     $required = ['ADMIN_DB_HOST', 'ADMIN_DB_PORT', 'ADMIN_DB_DATABASE', 'ADMIN_DB_USERNAME'];

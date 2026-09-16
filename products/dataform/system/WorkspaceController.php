@@ -7,7 +7,7 @@ final class WorkspaceController
     {
         return [
             ['key' => 'welcome', 'label' => 'Übersicht', 'icon' => '⌂'],
-            ['key' => 'dataforms', 'label' => 'DataForms', 'icon' => '▣'],
+            ['key' => 'dataforms', 'label' => 'Formulare', 'icon' => '▣'],
             ['key' => 'sources', 'label' => 'Datenquellen', 'icon' => '⛁'],
             ['key' => 'tables', 'label' => 'Tabellen', 'icon' => '▦'],
             ['key' => 'relations', 'label' => 'Beziehungen', 'icon' => '⇄', 'href' => 'relations.php'],
@@ -29,7 +29,7 @@ final class WorkspaceController
     {
         $sections = [
             'welcome' => ['title' => 'Willkommen im DataForm Workspace', 'text' => 'Hier verwalten Sie DataForms, Datenquellen, Tabellen und alle weiteren Projektbestandteile.'],
-            'dataforms' => ['title' => 'DataForms', 'text' => 'Hier listen Sie DataForms auf und legen neue DataForms für das aktive Projekt an.'],
+            'dataforms' => ['title' => 'Formulare', 'text' => 'Hier verwalten Sie die Formulare (DataForms) des aktiven Projekts und legen neue Formulare an.'],
             'dataform' => ['title' => 'DataForm bearbeiten', 'text' => 'Hier verwalten Sie die Felder und Eigenschaften des ausgewählten DataForms.'],
             'designer' => ['title' => 'Formular-Designer', 'text' => 'Hier gestalten Sie das Formular, bearbeiten Feldeigenschaften und prüfen die Live-Vorschau.'],
             'sources' => ['title' => 'Datenquellen', 'text' => 'MySQL/MariaDB, SQLite, CSV und Oracle als projektbezogene Datenquellen verwalten und testen.'],

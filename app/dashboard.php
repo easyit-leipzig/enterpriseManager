@@ -31,7 +31,7 @@ render_breadcrumbs([['label'=>'Enterprise','href'=>'dashboard.php'],['label'=>'D
 <a class="button" <?= easyit_button_attributes('neu','project') ?> href="projects/create.php">Neues Projekt anlegen</a>
 <a class="button secondary" <?= easyit_button_attributes('projekt_registrieren') ?> href="projects/register.php">Vorhandenes Projekt registrieren</a>
 <a class="button secondary" <?= easyit_button_attributes('anzeigen','overview') ?> href="operations/index.php">Betriebszentrale</a>
-<?php if(enterprise_can($user,'permissions.manage')):?><a class="button secondary" <?= easyit_button_attributes('security_benutzer') ?> href="security/users.php">Benutzer & Rechte</a><?php endif;?><?php if(enterprise_can($user,'permissions.manage')):?><a class="button secondary" <?= easyit_button_attributes('verlauf') ?> href="security/audit.php">Audit-Protokoll</a><?php endif;?>
+<?php if(enterprise_can($user,'permissions.manage')):?><a class="button secondary" <?= easyit_button_attributes('security_benutzer') ?> href="security/users.php">Benutzer & Rechte</a><?php endif;?><?php if(enterprise_can($user,'permissions.manage')):?><a class="button secondary" <?= easyit_button_attributes('database_benutzer') ?> href="security/database-users.php">DB-Benutzer</a><?php endif;?><?php if(enterprise_can($user,'permissions.manage')):?><a class="button secondary" <?= easyit_button_attributes('verlauf') ?> href="security/audit.php">Audit-Protokoll</a><?php endif;?>
 <a class="button secondary" <?= easyit_button_attributes('setup') ?> href="../setup.php">Installation / Setup</a>
 <a class="button secondary" <?= easyit_button_attributes('datenbank_assistent') ?> href="../installer/database.php">Datenbank-Assistent</a>
 <a class="button secondary" <?= easyit_button_attributes('restore') ?> href="../recovery.php">Recovery / Reset</a>
@@ -93,8 +93,8 @@ render_breadcrumbs([['label'=>'Enterprise','href'=>'dashboard.php'],['label'=>'D
 <?php if(!$projects):?>
 <div class="empty-state"><h3>Noch kein Projekt vorhanden</h3><p>Legen Sie jetzt das erste Produktprojekt an.</p><a class="button" href="projects/create.php">Projekt anlegen</a></div>
 <?php else:?>
-<div class="table-wrap"><table><thead><tr><th>Name</th><th>Produkt</th><th>Datenbank</th><th>Status</th><th></th></tr></thead><tbody>
-<?php foreach($projects as $p):?><tr><td><strong><?=e((string)$p['name'])?></strong></td><td><?=e((string)($p['product_type']??'dataform'))?></td><td><code><?=e((string)$p['database_name'])?></code></td><td><?=e((string)$p['status'])?></td><td><a href="projects/view.php?id=<?=(int)$p['id']?>">Öffnen</a></td></tr><?php endforeach;?>
+<div class="table-wrap"><table><thead><tr><th>Name</th><th>Produkt</th><th>Datenbank</th><th>Status</th><th>Aktionen</th></tr></thead><tbody>
+<?php foreach($projects as $p):?><tr><td><strong><?=e((string)$p['name'])?></strong></td><td><?=e((string)($p['product_type']??'dataform'))?></td><td><code><?=e((string)$p['database_name'])?></code></td><td><?=e((string)$p['status'])?></td><td><div class="project-crud-actions"><a class="button" <?= easyit_button_attributes('anzeigen','project') ?> href="projects/view.php?id=<?=(int)$p['id']?>">Öffnen</a><?php if(enterprise_can($user,'projects.update')):?><a class="button" <?= easyit_button_attributes('bearbeiten','project') ?> href="projects/edit.php?id=<?=(int)$p['id']?>">Bearbeiten</a><?php endif;?><?php if(enterprise_can($user,'projects.delete')):?><a class="button" <?= easyit_button_attributes('loeschen','project') ?> href="projects/delete.php?id=<?=(int)$p['id']?>">Projekt löschen</a><?php endif;?></div></td></tr><?php endforeach;?>
 </tbody></table></div>
 <?php endif;?>
 </section>

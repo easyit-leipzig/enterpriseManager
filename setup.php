@@ -41,9 +41,9 @@ $unavailableSelections = [];
 // RC1.1 legacy installer driver marker: ['mysql','csv','sqlite','pgsql','oracle','mssql']
 $form=[
  'admin_driver'=>$defaultDriver,'admin_csv_base'=>'storage/admin-csv','admin_sqlite_base'=>'storage/admin-sqlite',
- 'admin_db_host'=>'127.0.0.1','admin_db_port'=>'3306','admin_oracle_service'=>'XEPDB1','db_database'=>'easyit_admin','admin_db_username'=>'root','admin_db_password'=>'',
- 'project_driver'=>$defaultDriver,'project_csv_base'=>'storage/project-csv','project_sqlite_base'=>'storage/project-sqlite','project_database'=>'easyit_project_demo',
- 'project_db_host'=>'127.0.0.1','project_db_port'=>'3306','project_oracle_service'=>'XEPDB1','project_db_username'=>'root','project_db_password'=>'',
+ 'admin_db_host'=>'127.0.0.1','admin_db_port'=>'3306','admin_oracle_service'=>'XEPDB1','admin_db_maintenance_database'=>'postgres','db_database'=>'easyit_admin','admin_db_schema'=>'easyit_admin','admin_db_username'=>'root','admin_db_password'=>'',
+ 'project_driver'=>$defaultDriver,'project_csv_base'=>'storage/project-csv','project_sqlite_base'=>'storage/project-sqlite','project_name'=>'Demo','project_database'=>'easyit_project_demo',
+ 'project_db_host'=>'127.0.0.1','project_db_port'=>'3306','project_oracle_service'=>'XEPDB1','project_db_maintenance_database'=>'postgres','project_db_schema'=>'easyit_project_demo','project_db_username'=>'root','project_db_password'=>'',
  'admin_username'=>'admin','admin_email'=>'','admin_password'=>'','admin_password_confirm'=>'',
  'products'=>['dataform'],'environment'=>'production','timezone'=>'Europe/Berlin',
 ];
@@ -59,16 +59,21 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   'admin_db_host'=>trim((string)($_POST['admin_db_host']??$_POST['db_host']??'127.0.0.1')),
   'admin_db_port'=>(string)($_POST['admin_db_port']??$_POST['db_port']??($adminDriver==='pgsql'?'5432':($adminDriver==='oracle'?'1521':($adminDriver==='mssql'?'1433':'3306')))),
   'db_database'=>trim((string)($_POST['db_database']??'easyit_admin')),
+  'admin_db_schema'=>trim((string)($_POST['admin_db_schema']??'easyit_admin')),
+  'admin_db_maintenance_database'=>trim((string)($_POST['admin_db_maintenance_database']??'postgres')),
   'admin_oracle_service'=>trim((string)($_POST['admin_oracle_service']??'XEPDB1')),
   'admin_db_username'=>trim((string)($_POST['admin_db_username']??$_POST['db_username']??($adminDriver==='pgsql'?'postgres':($adminDriver==='oracle'?'easyit_admin':'root')))),
   'admin_db_password'=>(string)($_POST['admin_db_password']??$_POST['db_password']??''),
   'project_driver'=>isset($driverOptions[$projectDriver])?$projectDriver:$defaultDriver,
   'project_csv_base'=>trim((string)($_POST['project_csv_base']??'storage/project-csv')),
+  'project_name'=>trim((string)($_POST['project_name']??'Demo')),
   'project_sqlite_base'=>trim((string)($_POST['project_sqlite_base']??'storage/project-sqlite')),
   'project_database'=>trim((string)($_POST['project_database']??'easyit_project_demo')),
   'project_db_host'=>trim((string)($_POST['project_db_host']??$_POST['db_host']??'127.0.0.1')),
   'project_db_port'=>(string)($_POST['project_db_port']??$_POST['db_port']??($projectDriver==='pgsql'?'5432':($projectDriver==='oracle'?'1521':($projectDriver==='mssql'?'1433':'3306')))),
   'project_oracle_service'=>trim((string)($_POST['project_oracle_service']??'XEPDB1')),
+  'project_db_schema'=>trim((string)($_POST['project_db_schema']??'easyit_project_demo')),
+  'project_db_maintenance_database'=>trim((string)($_POST['project_db_maintenance_database']??'postgres')),
   'project_db_username'=>trim((string)($_POST['project_db_username']??$_POST['db_username']??($projectDriver==='pgsql'?'postgres':($projectDriver==='oracle'?'easyit_project':'root')))),
   'project_db_password'=>(string)($_POST['project_db_password']??$_POST['db_password']??''),
   'admin_username'=>trim((string)($_POST['admin_username']??'admin')),
@@ -87,9 +92,13 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         $password=(string)($_POST['admin_password']??'');
         $confirm=(string)($_POST['admin_password_confirm']??'');
         if($password!==$confirm)throw new RuntimeException('Superadmin-Kennwörter stimmen nicht überein.');
+        if($form['project_name']==='')throw new RuntimeException('Projektname ist erforderlich.');
+        if($form['admin_driver']==='pgsql' && preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$form['admin_db_schema'])!==1)throw new RuntimeException('Ungültiges PostgreSQL-Administrationsschema.');
+        if($form['project_driver']==='pgsql' && preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$form['project_db_schema'])!==1)throw new RuntimeException('Ungültiges PostgreSQL-Projektschema.');
         $result=$installer->install([
             'environment'=>$form['environment'],
             'timezone'=>$form['timezone'],
+            'project_name'=>$form['project_name'],
             'database'=>[
                 'driver'=>$form['admin_driver'],
                 'base_path'=>$form['admin_csv_base'],
@@ -98,6 +107,8 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 'service'=>$form['admin_oracle_service'],
                 'port'=>(int)$form['admin_db_port'],
                 'database'=>$form['db_database'],
+                'schema'=>$form['admin_db_schema'],
+                'maintenance_database'=>$form['admin_db_maintenance_database'],
                 'username'=>$form['admin_db_username'],
                 'password'=>$form['admin_db_password'],
             ],
@@ -106,6 +117,8 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 'base_path'=>$form['project_csv_base'],
                 'sqlite_base_path'=>$form['project_sqlite_base'],
                 'database'=>$form['project_database'],
+                'schema'=>$form['project_db_schema'],
+                'maintenance_database'=>$form['project_db_maintenance_database'],
                 'host'=>$form['project_db_host'],
                 'service'=>$form['project_oracle_service'],
                 'port'=>(int)$form['project_db_port'],
@@ -181,35 +194,40 @@ $statusLabel=$ok?'<strong>OK</strong>':($required?'Fehler':'Optional');?>
 <label>Treiber<select name="admin_driver" id="admin_driver">
 <?php foreach($driverOptions as $driver=>$label):?><option value="<?=e($driver)?>" <?=$form['admin_driver']===$driver?'selected':''?>><?=e($label)?></option><?php endforeach;?>
 </select></label>
-<label>Name des Administrationsspeichers<input name="db_database" value="<?=e($form['db_database'])?>" required pattern="[A-Za-z][A-Za-z0-9_]{1,62}"></label>
+<label>Administrationsdatenbank<input name="db_database" value="<?=e($form['db_database'])?>" required pattern="[A-Za-z][A-Za-z0-9_]{1,62}"></label>
+<label data-admin-pgsql>PostgreSQL-Schema<input name="admin_db_schema" value="<?=e($form['admin_db_schema'])?>" required pattern="[A-Za-z][A-Za-z0-9_]{0,62}"></label>
 <label data-admin-csv>CSV-Basisordner<input name="admin_csv_base" value="<?=e($form['admin_csv_base'])?>" placeholder="storage/admin-csv"></label>
 <label data-admin-sqlite>SQLite-Basisordner<input name="admin_sqlite_base" value="<?=e($form['admin_sqlite_base'])?>" placeholder="storage/admin-sqlite"></label>
 </div>
 <div class="form-grid" data-admin-sql>
 <label>Admin-DB Host<input name="admin_db_host" value="<?=e($form['admin_db_host'])?>"></label>
 <label>Admin-DB Port<input name="admin_db_port" type="number" min="1" max="65535" value="<?=e($form['admin_db_port'])?>"></label>
+<label data-admin-pgsql>PostgreSQL-Wartungsdatenbank<input name="admin_db_maintenance_database" value="<?=e($form['admin_db_maintenance_database'])?>" placeholder="postgres"></label>
 <label data-admin-oracle>Oracle Service/PDB<input name="admin_oracle_service" value="<?=e($form['admin_oracle_service'])?>" placeholder="XEPDB1"></label>
 <label>Admin-DB Benutzer<input name="admin_db_username" value="<?=e($form['admin_db_username'])?>"></label>
 <label>Admin-DB Kennwort<input name="admin_db_password" type="password" value="<?=e($form['admin_db_password'])?>" autocomplete="new-password" data-password-field></label>
 </div>
 <p data-admin-csv><small>CSV speichert Benutzer, Rollen, Projekte, Audit-Protokoll, Lizenzen, Modulkonfiguration und Migrationsstatus persistent unter <code>Basisordner/Name</code>.</small></p>
 <p data-admin-sqlite><small>SQLite speichert die vollständige Enterprise-Administration in <code>Basisordner/Name.sqlite</code>. Benötigt wird <code>pdo_sqlite</code>.</small></p>
-<p data-admin-pgsql><small>PostgreSQL speichert die Enterprise-Administration nativ in einer PostgreSQL-Datenbank. Benötigt wird <code>pdo_pgsql</code>; Standardport ist 5432.</small></p>
+<p data-admin-pgsql><small>PostgreSQL verwendet immer die Kombination <strong>Datenbank + Schema</strong>. Die Datenbank und das angegebene Schema werden bei ausreichenden Rechten automatisch angelegt und anschließend verifiziert. Benötigt wird <code>pdo_pgsql</code>; Standardport ist 5432.</small></p>
 <p data-admin-mssql><small>Microsoft SQL Server benötigt <code>pdo_sqlsrv</code>; Standardport ist 1433. Verschlüsselte Verbindungen sind die Voreinstellung.</small></p>
 <p data-admin-oracle><small>Oracle XE verwendet ein vorhandenes Schema/User im PDB (Standardservice <code>XEPDB1</code>). Benötigt wird <code>pdo_oci</code>; Standardport ist 1521.</small></p>
 
 <h3>Projektdatenspeicher</h3>
 <div class="form-grid">
+<label>Projektname<input name="project_name" value="<?=e($form['project_name'])?>" required placeholder="Demo"><small>Dieses Projekt wird nach erfolgreicher Installation sofort in der Projektliste registriert.</small></label>
 <label>Treiber<select name="project_driver" id="project_driver">
 <?php foreach($driverOptions as $driver=>$label):?><option value="<?=e($driver)?>" <?=$form['project_driver']===$driver?'selected':''?>><?=e($label)?></option><?php endforeach;?>
 </select></label>
 <label>Projekt-Datenbank-/Speichername<input name="project_database" value="<?=e($form['project_database'])?>" required pattern="[A-Za-z][A-Za-z0-9_]{1,62}"></label>
+<label data-project-pgsql>PostgreSQL-Schema<input name="project_db_schema" value="<?=e($form['project_db_schema'])?>" required pattern="[A-Za-z][A-Za-z0-9_]{0,62}"></label>
 <label data-project-csv>CSV-Basisordner<input name="project_csv_base" value="<?=e($form['project_csv_base'])?>" placeholder="storage/project-csv"></label>
 <label data-project-sqlite>SQLite-Basisordner<input name="project_sqlite_base" value="<?=e($form['project_sqlite_base'])?>" placeholder="storage/project-sqlite"></label>
 </div>
 <div class="form-grid" data-project-sql>
 <label>Projekt-DB Host<input name="project_db_host" value="<?=e($form['project_db_host'])?>"></label>
 <label>Projekt-DB Port<input name="project_db_port" type="number" min="1" max="65535" value="<?=e($form['project_db_port'])?>"></label>
+<label data-project-pgsql>PostgreSQL-Wartungsdatenbank<input name="project_db_maintenance_database" value="<?=e($form['project_db_maintenance_database'])?>" placeholder="postgres"></label>
 <label data-project-oracle>Oracle Service/PDB<input name="project_oracle_service" value="<?=e($form['project_oracle_service'])?>" placeholder="XEPDB1"></label>
 <label>Projekt-DB Benutzer<input name="project_db_username" value="<?=e($form['project_db_username'])?>"></label>
 <label>Projekt-DB Kennwort<input name="project_db_password" type="password" value="<?=e($form['project_db_password'])?>" autocomplete="new-password" data-password-field></label>
@@ -217,7 +235,7 @@ $statusLabel=$ok?'<strong>OK</strong>':($required?'Fehler':'Optional');?>
 <p data-project-csv><small>DataForms, Bindings und physische Datensätze werden als <code>|</code>-getrennte CSV-Dateien mit Pflicht-ID <code>id</code> gespeichert.</small></p>
 <p data-project-sqlite><small>DataForms, Bindings und physische Datensätze liegen in <code>Basisordner/Name.sqlite</code>.</small></p>
 <p data-project-mssql><small>DataForms, Bindings, Tabellen und Datensätze können vollständig in Microsoft SQL Server liegen.</small></p>
-<p data-project-pgsql><small>DataForms, Bindings, Tabellen und Datensätze liegen vollständig in PostgreSQL. Der Projekttreiber kann unabhängig vom Administrationsspeicher gewählt werden.</small></p>
+<p data-project-pgsql><small>DataForms, Bindings, Tabellen und Datensätze liegen vollständig in der konfigurierten PostgreSQL-Kombination <strong>Datenbank + Schema</strong>. Datenbank und Schema werden bei ausreichenden Rechten automatisch angelegt und verifiziert.</small></p>
 <p data-project-oracle><small>DataForms, Bindings, Tabellen und Datensätze liegen vollständig im gewählten Oracle-XE-Schema/User.</small></p>
 <div class="notice"><strong>Treiberregel:</strong> Ein SQL-Datenbanktyp wird nur angeboten, wenn der zugehörige PDO-Treiber in der aktuell laufenden PHP-Version registriert ist. CSV bleibt ohne PDO verfügbar.</div>
 </section>

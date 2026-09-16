@@ -128,7 +128,7 @@ $rows=$pdo->query("SELECT u.id,u.username,u.email,u.is_active,u.created_at,GROUP
 ob_start();
 render_breadcrumbs([['label'=>'Enterprise','href'=>'../dashboard.php'],['label'=>'Benutzer & Rechte','href'=>''],['label'=>'Benutzer','href'=>'']]);
 ?>
-<section class="hero"><span class="badge">HF9 · Identity Administration</span><h1>Benutzerverwaltung</h1><p>Benutzerkonten, Aktivstatus, Kennwörter und Rollenzuweisungen zentral verwalten.</p><div class="actions"><a class="button secondary" href="roles.php">Rollen verwalten</a><a class="button secondary" href="capabilities.php">Capabilities</a><a class="button secondary" href="audit.php">Audit-Protokoll</a></div></section>
+<section class="hero"><span class="badge">Identity Administration</span><h1>Benutzerverwaltung</h1><p>Enterprise-Anmeldekonten, Aktivstatus, Kennwörter und Rollenzuweisungen zentral verwalten. Technische MySQL-/PostgreSQL-Konten werden getrennt verwaltet.</p><div class="actions"><a class="button secondary" <?= easyit_button_attributes('database_benutzer') ?> href="database-users.php">DB-Benutzer</a><a class="button secondary" <?= easyit_button_attributes('security_rollen') ?> href="roles.php">Rollen verwalten</a><a class="button secondary" <?= easyit_button_attributes('security_capabilities') ?> href="capabilities.php">Capabilities</a><a class="button secondary" <?= easyit_button_attributes('verlauf') ?> href="audit.php">Audit-Protokoll</a></div></section>
 <?php if($message):?><div class="notice success"><?=e($message)?></div><?php endif;?><?php if($error):?><div class="notice error"><?=e($error)?></div><?php endif;?>
 
 <section class="card"><h2>Neuen Benutzer anlegen</h2>

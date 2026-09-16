@@ -207,6 +207,12 @@ final class TableWorkspaceManager
         self::assertFieldCrudTable($pdo,$table);
 
         $baseType=strtolower(trim($type));
+        $messages=[];
+        $isPgsql=self::isPgsqlPdo($pdo);
+        if($isPgsql && $baseType==='datetime'){
+            $baseType='timestamp';
+            $messages[]='PostgreSQL verwendet für DATETIME den nativen Typ TIMESTAMP.';
+        }
         self::normalizeColumnType($baseType);
 
         $numeric=preg_match(
@@ -227,7 +233,6 @@ final class TableWorkspaceManager
             $defaultKind='none';
         }
         $indexKind=self::normalizeIndexKind($indexKind);
-        $messages=[];
 
         $removeExtra=static function(
             string $extra,
@@ -242,6 +247,12 @@ final class TableWorkspaceManager
                 $messages[]=$message;
             }
         };
+
+        if($isPgsql){
+            $removeExtra('unsigned','UNSIGNED wurde entfernt: PostgreSQL unterstützt diese MySQL-Eigenschaft nicht.');
+            $removeExtra('zerofill','ZEROFILL wurde entfernt: PostgreSQL unterstützt diese MySQL-Eigenschaft nicht.');
+            $removeExtra('auto_increment','AUTO_INCREMENT wurde entfernt: PostgreSQL verwendet für automatisch erzeugte Schlüssel Identity/Sequenzen; normale DataForm-Felder werden hier nicht nachträglich zu AUTO_INCREMENT umgebaut.');
+        }
 
         if (!$numeric) {
             $removeExtra(
@@ -437,6 +448,13 @@ final class TableWorkspaceManager
             'ALTER TABLE '.self::quoteIdentifier($table,'mysql')
             .' '.implode(', ',$actions)
         );
+        self::syncPgsqlOnUpdateTrigger(
+            $pdo,
+            $table,
+            null,
+            $column,
+            in_array('on_update_current_timestamp',array_map('strtolower',$extras),true)
+        );
     }
 
     public static function updateManagedColumn(
@@ -548,6 +566,13 @@ final class TableWorkspaceManager
             'ALTER TABLE '.self::quoteIdentifier($table,'mysql')
             .' '.implode(', ',$actions)
         );
+        self::syncPgsqlOnUpdateTrigger(
+            $pdo,
+            $table,
+            $originalColumn,
+            $newColumn,
+            in_array('on_update_current_timestamp',array_map('strtolower',$extras),true)
+        );
     }
 
     public static function moveManagedColumn(
@@ -638,6 +663,7 @@ final class TableWorkspaceManager
             return;
         }
 
+        self::syncPgsqlOnUpdateTrigger($pdo,$table,$column,$column,false);
         $pdo->exec(
             'ALTER TABLE '.self::quoteIdentifier($table,'mysql')
             .' DROP COLUMN '.self::quoteIdentifier($column,'mysql')
@@ -1159,6 +1185,12 @@ final class TableWorkspaceManager
                 },
                 $raw
             );
+            foreach($columns as &$pgsqlColumn){
+                if(self::pgsqlHasOnUpdateTrigger($pdo,$table,(string)$pgsqlColumn['name'])){
+                    $pgsqlColumn['extra']=trim((string)$pgsqlColumn['extra'].' on update current_timestamp');
+                }
+            }
+            unset($pgsqlColumn);
             $count=(int)$pdo->query('SELECT COUNT(*) FROM '.$quoted)->fetchColumn();
             $preview=$pdo->query('SELECT * FROM '.$quoted.' LIMIT '.$previewLimit)->fetchAll(PDO::FETCH_ASSOC);
         } elseif ($driver === 'mssql') {
@@ -1285,7 +1317,7 @@ final class TableWorkspaceManager
             );
         }
 
-        return new PDO(
+        $pdo=new PDO(
             $dsn,
             $username,
             $password,
@@ -1295,6 +1327,15 @@ final class TableWorkspaceManager
                 PDO::ATTR_EMULATE_PREPARES=>false,
             ]
         );
+        if($driver==='pgsql'){
+            $schema=trim((string)($config['schema']??'public'))?:'public';
+            if(preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)!==1){
+                throw new RuntimeException('Ungültiger PostgreSQL-Schemaname.');
+            }
+            $pdo->exec("SET client_encoding TO 'UTF8'");
+            $pdo->exec('SET search_path TO "'.$schema.'"');
+        }
+        return $pdo;
     }
 
     private static function assertFieldCrudTable(PDO $pdo,string $table): void
@@ -1839,6 +1880,13 @@ final class TableWorkspaceManager
         catch (Throwable) { return false; }
     }
 
+    private static function isPgsqlPdo(PDO $pdo): bool
+    {
+        if (class_exists('EnterprisePgsqlPdo',false) && $pdo instanceof EnterprisePgsqlPdo) return true;
+        try { return strtolower((string)$pdo->getAttribute(PDO::ATTR_DRIVER_NAME))==='pgsql'; }
+        catch (Throwable) { return false; }
+    }
+
     private static function isOraclePdo(PDO $pdo): bool
     {
         if (class_exists('EnterpriseOraclePdo',false) && $pdo instanceof EnterpriseOraclePdo) return true;
@@ -1983,6 +2031,68 @@ final class TableWorkspaceManager
         finally{$pdo->exec('PRAGMA foreign_keys=ON');}
         $violations=$pdo->query('PRAGMA foreign_key_check')->fetchAll(PDO::FETCH_ASSOC);
         if($violations!==[])throw new RuntimeException('SQLite-Schemaänderung erzeugte Fremdschlüsselverletzungen; Tabelle bitte aus Sicherung prüfen.');
+    }
+
+    private static function pgsqlOnUpdateObjectNames(string $table,string $column): array
+    {
+        $hash=substr(hash('sha256',$table."\0".$column),0,16);
+        return [
+            'trigger'=>'df_touch_'.$hash,
+            'function'=>'df_touch_fn_'.$hash,
+        ];
+    }
+
+    private static function pgsqlHasOnUpdateTrigger(PDO $pdo,string $table,string $column): bool
+    {
+        if(!self::isPgsqlPdo($pdo)) return false;
+        $names=self::pgsqlOnUpdateObjectNames($table,$column);
+        $stmt=$pdo->prepare(
+            "SELECT COUNT(*) FROM pg_trigger tg "
+            ."JOIN pg_class c ON c.oid=tg.tgrelid "
+            ."JOIN pg_namespace n ON n.oid=c.relnamespace "
+            ."WHERE n.nspname=current_schema() AND c.relname=? "
+            ."AND tg.tgname=? AND NOT tg.tgisinternal"
+        );
+        $stmt->execute([$table,$names['trigger']]);
+        return (int)$stmt->fetchColumn()>0;
+    }
+
+    private static function syncPgsqlOnUpdateTrigger(
+        PDO $pdo,
+        string $table,
+        ?string $oldColumn,
+        string $newColumn,
+        bool $enabled
+    ): void {
+        if(!self::isPgsqlPdo($pdo)) return;
+
+        $quotedTable=self::quoteIdentifier($table,'pgsql');
+        $drop=function(string $column) use ($pdo,$quotedTable): void {
+            $names=self::pgsqlOnUpdateObjectNames(trim($quotedTable,'"'),$column);
+            $quotedTrigger=self::quoteIdentifier($names['trigger'],'pgsql');
+            $quotedFunction=self::quoteIdentifier($names['function'],'pgsql');
+            $pdo->exec('DROP TRIGGER IF EXISTS '.$quotedTrigger.' ON '.$quotedTable);
+            $pdo->exec('DROP FUNCTION IF EXISTS '.$quotedFunction.'()');
+        };
+
+        if($oldColumn!==null && $oldColumn!=='') $drop($oldColumn);
+        if($oldColumn===null || $oldColumn!==$newColumn) $drop($newColumn);
+        if(!$enabled) return;
+
+        $names=self::pgsqlOnUpdateObjectNames($table,$newColumn);
+        $quotedTrigger=self::quoteIdentifier($names['trigger'],'pgsql');
+        $quotedFunction=self::quoteIdentifier($names['function'],'pgsql');
+        $quotedColumn=self::quoteIdentifier($newColumn,'pgsql');
+        $pdo->exec(
+            'CREATE OR REPLACE FUNCTION '.$quotedFunction.'() RETURNS trigger AS $$ '
+            .'BEGIN IF NEW.'.$quotedColumn.' IS NOT DISTINCT FROM OLD.'.$quotedColumn.' THEN '
+            .'NEW.'.$quotedColumn.' = CURRENT_TIMESTAMP; END IF; RETURN NEW; END; '
+            .'$$ LANGUAGE plpgsql'
+        );
+        $pdo->exec(
+            'CREATE TRIGGER '.$quotedTrigger.' BEFORE UPDATE ON '.$quotedTable
+            .' FOR EACH ROW EXECUTE FUNCTION '.$quotedFunction.'()'
+        );
     }
 
     private static function normalizeColumnType(string $type): string

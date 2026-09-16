@@ -12,13 +12,22 @@ final class DataSourceConfigCompiler
         $c = $d['connection'];
 
         $connection = match ($driver) {
-            'mysql', 'pgsql', 'mssql' => [
+            'pgsql' => [
+                'host' => $c['host'],
+                'port' => (int) $c['port'],
+                'database' => $c['database'],
+                'schema' => trim((string)($c['schema'] ?? 'public')) ?: 'public',
+                'username' => $c['username'],
+                'passwordRef' => $c['passwordRef'],
+                'charset' => $c['charset'] ?: 'UTF8',
+            ],
+            'mysql', 'mssql' => [
                 'host' => $c['host'],
                 'port' => (int) $c['port'],
                 'database' => $c['database'],
                 'username' => $c['username'],
                 'passwordRef' => $c['passwordRef'],
-                'charset' => $c['charset'] ?: ($driver === 'pgsql' ? 'UTF8' : ($driver === 'mssql' ? 'UTF-8' : 'utf8mb4')),
+                'charset' => $c['charset'] ?: ($driver === 'mssql' ? 'UTF-8' : 'utf8mb4'),
                 'encrypt' => $driver === 'mssql' ? (bool)($c['encrypt'] ?? true) : null,
                 'trustServerCertificate' => $driver === 'mssql' ? (bool)($c['trustServerCertificate'] ?? false) : null,
             ],

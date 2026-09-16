@@ -501,7 +501,7 @@ function enterprise_project_backup_create(array $env, array $project, int $userI
         $manifest=[
             'format'=>'easyit-project-backup','format_version'=>4,'created_at'=>gmdate('c'),'project'=>[
                 'id'=>(int)($project['id']??0),'name'=>(string)($project['name']??''),'slug'=>(string)($project['slug']??''),'product_type'=>(string)($project['product_type']??''),
-                'database_driver'=>$driver,'database_name'=>$database,
+                'database_driver'=>$driver,'database_name'=>$database,'database_schema'=>$driver==='pgsql'?enterprise_project_store_pgsql_schema($env):'',
             ],'data_format'=>$dataFormat,'database'=>$stats,'files'=>array_merge($payloadFiles,['manifest.json'], $driver==='csv'?['csv-data/']:($driver==='sqlite'?['sqlite-data/database.sqlite']:($driver==='pgsql'?['postgresql-data/database.sql']:($driver==='oracle'?['oracle-data/database.sql']:($driver==='mssql'?['mssql-data/database.sql']:[]))))),
         ];
         $readme="easyIT Enterprise – Projektsicherung\n======================================\n\nProjekt: ".(string)($project['name']??'')."\nTreiber: ".strtoupper($driver)."\nSpeicher: ".$database."\nErstellt: ".gmdate('c')."\n\n";

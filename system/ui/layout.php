@@ -44,6 +44,7 @@ function render_page(array $page): void
         'products' => ['Produkte', $base . 'app/products/index.php'],
         'licensing' => ['Lizenzen', $base . 'app/licensing/index.php'],
         'security' => ['Benutzer & Rechte', $base . 'app/security/users.php'],
+        'db-users' => ['DB-Benutzer', $base . 'app/security/database-users.php'],
         'audit' => ['Audit-Protokoll', $base . 'app/security/audit.php'],
         'modules' => ['Module', $base . 'app/modules/index.php'],
         'operations' => ['Betrieb', $base . 'app/operations/index.php'],

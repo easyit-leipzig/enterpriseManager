@@ -44,6 +44,11 @@ final class ProjectDraftValidator
             if (in_array($driver, ['mysql','pgsql','mssql'], true) && trim((string) ($d['dataSource']['databaseName'] ?? '')) === '') {
                 $errors[] = ($driver === 'pgsql' ? 'PostgreSQL' : ($driver === 'mssql' ? 'Microsoft SQL Server' : 'MySQL')) . '-Datenbankname fehlt.';
             }
+            if ($driver === 'pgsql') {
+                $schema = trim((string)($d['dataSource']['schemaName'] ?? ''));
+                if ($schema === '') $errors[] = 'PostgreSQL-Schema fehlt.';
+                elseif (preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/', $schema) !== 1) $errors[] = 'Ungültiger PostgreSQL-Schemaname.';
+            }
             if (in_array($driver, ['sqlite', 'csv'], true) && trim((string) ($d['dataSource']['localPath'] ?? '')) === '') {
                 $errors[] = 'Lokaler Datenpfad fehlt.';
             }

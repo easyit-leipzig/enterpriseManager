@@ -611,10 +611,13 @@ function enterprise_project_restore_pgsql_store(array $env,string $sourceDatabas
     $created=false;
     try{
         enterprise_project_store_create($env,$targetDatabase,'pgsql');$created=true;
-        $pdo=new PDO(
-            'pgsql:host='.(string)($env['PROJECT_DB_HOST']??'127.0.0.1').';port='.(int)($env['PROJECT_DB_PORT']??5432).';dbname='.$targetDatabase,
-            (string)($env['PROJECT_DB_USERNAME']??''),(string)($env['PROJECT_DB_PASSWORD']??''),
-            [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC,PDO::ATTR_EMULATE_PREPARES=>false]
+        $pdo=new EnterprisePgsqlPdo(
+            (string)($env['PROJECT_DB_HOST']??'127.0.0.1'),
+            (int)($env['PROJECT_DB_PORT']??5432),
+            $targetDatabase,
+            (string)($env['PROJECT_DB_USERNAME']??''),
+            (string)($env['PROJECT_DB_PASSWORD']??''),
+            enterprise_project_store_pgsql_schema($env)
         );
         @set_time_limit(0);
         $pdo->exec($databaseSql);

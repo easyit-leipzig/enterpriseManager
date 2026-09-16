@@ -64,8 +64,40 @@ function enterprise_pdo(): PDO {
         foreach (['ADMIN_DB_HOST','ADMIN_DB_PORT','ADMIN_DB_DATABASE','ADMIN_DB_USERNAME'] as $key) {
             if (empty($env[$key])) throw new RuntimeException("Konfiguration {$key} fehlt. Bitte Installer abschließen.");
         }
-        $pdo=new EnterprisePgsqlPdo((string)$env['ADMIN_DB_HOST'],(int)$env['ADMIN_DB_PORT'],(string)$env['ADMIN_DB_DATABASE'],(string)$env['ADMIN_DB_USERNAME'],(string)($env['ADMIN_DB_PASSWORD']??''));
-        return $pdo;
+        $host=(string)$env['ADMIN_DB_HOST'];
+        $port=(int)$env['ADMIN_DB_PORT'];
+        $database=trim((string)$env['ADMIN_DB_DATABASE']);
+        $username=(string)$env['ADMIN_DB_USERNAME'];
+        $password=(string)($env['ADMIN_DB_PASSWORD']??'');
+        $schema=trim((string)($env['ADMIN_DB_SCHEMA']??'public')) ?: 'public';
+        try {
+            $pdo=new EnterprisePgsqlPdo($host,$port,$database,$username,$password,$schema);
+            return $pdo;
+        } catch (PDOException $e) {
+            // Eine fehlende Ziel-Datenbank ist bei PostgreSQL kein Grund für
+            // einen ungefangenen Fatal Error. Über die Maintenance-Datenbank
+            // lässt sich eindeutig unterscheiden, ob die Admin-Datenbank
+            // tatsächlich fehlt oder die Verbindung aus anderem Grund scheitert.
+            try {
+                $maintenance=trim((string)($env['ADMIN_DB_MAINTENANCE_DATABASE']??'postgres')) ?: 'postgres';
+                $server=new EnterprisePgsqlPdo($host,$port,$maintenance,$username,$password,'public');
+                $st=$server->prepare('SELECT 1 FROM pg_database WHERE datname=?');
+                $st->execute([$database]);
+                if ($st->fetchColumn()===false) {
+                    throw new RuntimeException(
+                        'Die PostgreSQL-Administrationsdatenbank `'.$database.'` existiert nicht. Führen Sie das Setup bzw. den Datenbank-Assistenten aus, bevor Projekte verwaltet oder neu aufgebaut werden.',
+                        0,
+                        $e
+                    );
+                }
+            } catch (RuntimeException $diagnostic) {
+                throw $diagnostic;
+            } catch (Throwable) {
+                // Falls selbst die Maintenance-Verbindung nicht möglich ist,
+                // bleibt die ursprüngliche PDO-Ursache maßgeblich.
+            }
+            throw new RuntimeException('PostgreSQL-Administrationsspeicher konnte nicht geöffnet werden: '.$e->getMessage(),0,$e);
+        }
     }
     foreach (['ADMIN_DB_HOST','ADMIN_DB_PORT','ADMIN_DB_DATABASE','ADMIN_DB_USERNAME'] as $key) {
         if (empty($env[$key])) throw new RuntimeException("Konfiguration {$key} fehlt. Bitte Installer abschließen.");
@@ -162,7 +194,7 @@ function enterprise_require_auth(string $base='../'): array {
 }
 function enterprise_is_superadmin(array $user): bool { return in_array('superadmin',$user['roles'] ?? [],true); }
 function enterprise_is_admin(array $user): bool { return enterprise_is_superadmin($user) || in_array('admin',$user['roles'] ?? [],true); }
-function enterprise_landing_path(array $user): string { return enterprise_is_superadmin($user) ? 'app/projects/index.php' : 'app/dashboard.php'; }
+function enterprise_landing_path(array $user): string { return enterprise_is_admin($user) ? 'app/projects/index.php' : 'app/dashboard.php'; }
 function enterprise_sync_module_capabilities(PDO $pdo,string $modulesRoot): void { if(!is_dir($modulesRoot)) return; $stmt=$pdo->prepare('INSERT IGNORE INTO capabilities(name,module_name,label) VALUES (?,?,?)'); foreach(glob(rtrim($modulesRoot,'/\\').'/*/module.json')?:[] as $file){$data=json_decode((string)@file_get_contents($file),true);if(!is_array($data))continue;$module=(string)($data['name']??basename(dirname($file)));foreach((array)($data['capabilities']??[]) as $cap){if(is_string($cap)&&$cap!=='')$stmt->execute([$cap,$module,$cap]);}} if($pdo instanceof EnterpriseOraclePdo){foreach(['admin','superadmin'] as $roleName){$pdo->exec("INSERT INTO role_capabilities(role_id,capability_id) SELECT r.id,c.id FROM roles r CROSS JOIN capabilities c WHERE r.name='".$roleName."' AND NOT EXISTS (SELECT 1 FROM role_capabilities rc WHERE rc.role_id=r.id AND rc.capability_id=c.id)");}}else{$pdo->exec("INSERT IGNORE INTO role_capabilities(role_id,capability_id) SELECT r.id,c.id FROM roles r CROSS JOIN capabilities c WHERE r.name='admin'");$pdo->exec("INSERT IGNORE INTO role_capabilities(role_id,capability_id) SELECT r.id,c.id FROM roles r CROSS JOIN capabilities c WHERE r.name='superadmin'");} }
 function enterprise_permissions(PDO $pdo,int $userId): array { $st=$pdo->prepare('SELECT DISTINCT c.name FROM capabilities c JOIN role_capabilities rc ON rc.capability_id=c.id JOIN user_roles ur ON ur.role_id=rc.role_id WHERE ur.user_id=?'); $st->execute([$userId]); return array_column($st->fetchAll(PDO::FETCH_ASSOC),'name'); }
 function enterprise_can(array $user,string $capability): bool { return enterprise_is_superadmin($user) || enterprise_is_admin($user) || in_array($capability,$user['permissions']??[],true); }

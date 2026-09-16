@@ -28,7 +28,9 @@ final class AdminDatabaseInstaller
         if($driver==='pgsql'){
             require_once dirname(__DIR__,4).'/system/app/EnterprisePgsqlPdo.php';
             $database=$withoutDatabase?(string)($db['maintenance_database']??'postgres'):(string)$db['database'];
-            return new \EnterprisePgsqlPdo((string)$db['host'],(int)$db['port'],$database,(string)$db['username'],(string)($db['password']??''));
+            $schema=$withoutDatabase?'public':trim((string)($db['schema']??'public'));
+            if($schema==='')$schema='public';
+            return new \EnterprisePgsqlPdo((string)$db['host'],(int)$db['port'],$database,(string)$db['username'],(string)($db['password']??''),$schema);
         }
         $dsn='mysql:host='.(string)$db['host'].';port='.(int)$db['port'].';charset=utf8mb4';
         if(!$withoutDatabase) $dsn.=';dbname='.(string)$db['database'];
@@ -57,8 +59,18 @@ final class AdminDatabaseInstaller
             return;
         }
         if($driver==='pgsql'){
+            $schema=trim((string)($db['schema']??'public')) ?: 'public';
+            if(!preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)) throw new InstallerException('Ungültiger PostgreSQL-Schemaname.');
             $q=$pdo->prepare('SELECT 1 FROM pg_database WHERE datname=?');$q->execute([$name]);
             if($q->fetchColumn()===false)$pdo->exec('CREATE DATABASE "'.str_replace('"','""',$name).'" ENCODING \'UTF8\' TEMPLATE template0');
+            $q=$pdo->prepare('SELECT 1 FROM pg_database WHERE datname=?');$q->execute([$name]);
+            if($q->fetchColumn()===false) throw new InstallerException('PostgreSQL-Datenbank wurde nach CREATE DATABASE nicht gefunden: '.$name);
+            $targetDb=$db;$targetDb['database']=$name;$targetDb['schema']='public';
+            $target=$this->connect($targetDb,false);
+            $quoted='"'.str_replace('"','""',$schema).'"';
+            $target->exec('CREATE SCHEMA IF NOT EXISTS '.$quoted);
+            $st=$target->prepare('SELECT 1 FROM pg_namespace WHERE nspname=?');$st->execute([$schema]);
+            if($st->fetchColumn()===false) throw new InstallerException('PostgreSQL-Schema wurde nach CREATE SCHEMA nicht gefunden: '.$schema);
             return;
         }
         $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");

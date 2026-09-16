@@ -150,7 +150,7 @@ final class DataSourceAssistant implements AssistantInterface
         if ($stepId === 'profile') {
             $driver = strtolower(trim((string) $context->input('driver', 'mysql')));
             $defaults = DataSourceDraft::defaults()['connection'];
-            if ($driver === 'oracle') { $defaults['port'] = 1521; $defaults['charset'] = 'AL32UTF8'; } elseif ($driver === 'pgsql') { $defaults['port'] = 5432; $defaults['charset'] = 'UTF8'; } elseif ($driver === 'mssql') { $defaults['port'] = 1433; $defaults['charset'] = 'UTF-8'; }
+            if ($driver === 'oracle') { $defaults['port'] = 1521; $defaults['charset'] = 'AL32UTF8'; } elseif ($driver === 'pgsql') { $defaults['port'] = 5432; $defaults['charset'] = 'UTF8'; $defaults['schema'] = 'public'; } elseif ($driver === 'mssql') { $defaults['port'] = 1433; $defaults['charset'] = 'UTF-8'; }
             return $draft->merge([
                 'profile' => [
                     'name' => trim((string) $context->input('profile_name', 'project')),
@@ -172,6 +172,7 @@ final class DataSourceAssistant implements AssistantInterface
                     'host' => trim((string) $context->input('host', '127.0.0.1')),
                     'port' => (int) $context->input('port', $driver==='pgsql'?5432:($driver==='mssql'?1433:3306)),
                     'database' => trim((string) $context->input('database', '')),
+                    'schema' => $driver==='pgsql' ? (trim((string) $context->input('schema', 'public')) ?: 'public') : (string)($connection['schema']??'public'),
                     'username' => trim((string) $context->input('username', '')),
                     'passwordRef' => trim((string) $context->input('password_ref', '')),
                     'charset' => trim((string) $context->input('charset', $driver==='pgsql'?'UTF8':($driver==='mssql'?'UTF-8':'utf8mb4'))) ?: ($driver==='pgsql'?'UTF8':($driver==='mssql'?'UTF-8':'utf8mb4')),
@@ -303,6 +304,7 @@ final class DataSourceAssistant implements AssistantInterface
                 ['name' => 'host', 'label' => 'Host', 'type' => 'text', 'required' => true],
                 ['name' => 'port', 'label' => 'Port', 'type' => 'number', 'min' => 1, 'max' => 65535, 'default' => 5432],
                 ['name' => 'database', 'label' => 'Datenbank', 'type' => 'text', 'required' => true],
+                ['name' => 'schema', 'label' => 'Schema', 'type' => 'text', 'required' => true, 'default' => 'public'],
                 ['name' => 'username', 'label' => 'Benutzername', 'type' => 'text'],
                 ['name' => 'password', 'label' => 'Kennwort (nur Verbindungstest)', 'type' => 'password'],
                 ['name' => 'password_ref', 'label' => 'Kennwort-Referenz / ENV-Name', 'type' => 'text'],
@@ -359,7 +361,7 @@ final class DataSourceAssistant implements AssistantInterface
                 'driver' => $d['profile']['driver'],
             ],
             'connection' => [
-                'host' => $c['host'], 'port' => $c['port'], 'database' => $c['database'], 'username' => $c['username'],
+                'host' => $c['host'], 'port' => $c['port'], 'database' => $c['database'], 'schema' => $c['schema'] ?? 'public', 'username' => $c['username'],
                 'password' => '', 'password_ref' => $c['passwordRef'], 'charset' => $c['charset'], 'path' => $c['path'],
                 'service' => $c['service'], 'delimiter' => $c['delimiter'],
             ],

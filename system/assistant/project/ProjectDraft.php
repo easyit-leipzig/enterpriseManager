@@ -28,6 +28,7 @@ final class ProjectDraft implements \JsonSerializable
                 'profileName' => 'main',
                 'driver' => 'mysql',
                 'databaseName' => '',
+                'schemaName' => 'public',
                 'localPath' => '',
                 'requiresConnectionConfiguration' => true,
             ],

@@ -13,22 +13,27 @@ declare(strict_types=1);
 final class EnterprisePgsqlPdo extends PDO
 {
     private string $databaseName;
+    private string $schemaName;
 
     public function __construct(
         string $host,
         int $port,
         string $database,
         string $username,
-        string $password = ''
+        string $password = '',
+        string $schema = 'public'
     ) {
         if (!extension_loaded('pdo_pgsql')) {
             throw new RuntimeException('Die PHP-Erweiterung pdo_pgsql ist nicht aktiv.');
         }
-        $host=trim($host); $database=trim($database); $username=trim($username);
+        $host=trim($host); $database=trim($database); $username=trim($username); $schema=trim($schema);
         if ($host==='' || $database==='' || $username==='') {
             throw new RuntimeException('PostgreSQL benötigt Host, Datenbank und Benutzer.');
         }
         if ($port<1 || $port>65535) throw new RuntimeException('Ungültiger PostgreSQL-Port.');
+        if ($schema==='' || preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)!==1) {
+            throw new RuntimeException('Ungültiges PostgreSQL-Schema.');
+        }
         parent::__construct(
             'pgsql:host='.$host.';port='.$port.';dbname='.$database,
             $username,
@@ -40,11 +45,15 @@ final class EnterprisePgsqlPdo extends PDO
             ]
         );
         $this->databaseName=$database;
+        $this->schemaName=$schema;
         parent::exec("SET client_encoding TO 'UTF8'");
         parent::exec("SET TIME ZONE 'UTC'");
+        $quotedSchema='"'.$schema.'"';
+        parent::exec('SET search_path TO '.$quotedSchema);
     }
 
     public function databaseName(): string { return $this->databaseName; }
+    public function schemaName(): string { return $this->schemaName; }
 
     public function prepare(string $query, array $options = []): PDOStatement|false
     {
@@ -289,7 +298,12 @@ final class EnterprisePgsqlPdo extends PDO
         $definition=$this->convertColumnDefinition($definition);
         $definition=preg_replace('/\s+AFTER\s+\"?[A-Za-z_][A-Za-z0-9_]*\"?/i','',$definition)??$definition;
         $definition=preg_replace('/\s+FIRST\b/i','',$definition)??$definition;
-        if(!preg_match('/^((?:DOUBLE\s+PRECISION)|[A-Za-z]+(?:\s+[A-Za-z]+)?(?:\([^)]*\))?)\s*(.*)$/is',$definition,$m)) return [];
+        // Do not treat PostgreSQL column modifiers such as NULL/NOT NULL as
+        // part of the datatype. The former generic two-word pattern parsed
+        // e.g. "TIMESTAMP NULL" as a datatype and generated invalid SQL:
+        // ALTER COLUMN ... TYPE TIMESTAMP NULL USING ...
+        $typePattern='(?:DOUBLE\s+PRECISION|CHARACTER\s+VARYING(?:\(\d+\))?|TIMESTAMP(?:\s+(?:WITH|WITHOUT)\s+TIME\s+ZONE)?|TIME(?:\s+(?:WITH|WITHOUT)\s+TIME\s+ZONE)?|VARCHAR\(\d+\)|(?:NUMERIC|DECIMAL)\(\d+\s*,\s*\d+\)|BIGSERIAL|SERIAL|BIGINT|INTEGER|INT|SMALLINT|BOOLEAN|DATE|TEXT)';
+        if(!preg_match('/^('.$typePattern.')\s*(.*)$/is',$definition,$m)) return [];
         $type=trim($m[1]);$rest=trim($m[2]);
         // SERIAL is a pseudo-type only valid on ADD/CREATE. Existing sequence
         // semantics are retained when merely editing a column.

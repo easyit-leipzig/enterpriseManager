@@ -31,9 +31,9 @@ final class DataSourceManager
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     }
 
-    public static function drivers(): array
+    public static function drivers(bool $availableOnly=true): array
     {
-        return [
+        $all=[
             'mysql' => 'MySQL / MariaDB',
             'pgsql' => 'PostgreSQL',
             'sqlite' => 'SQLite',
@@ -41,6 +41,14 @@ final class DataSourceManager
             'oracle' => 'Oracle',
             'mssql' => 'Microsoft SQL Server',
         ];
+        if(!$availableOnly)return $all;
+        $pdoDrivers=class_exists(PDO::class)?PDO::getAvailableDrivers():[];
+        $required=['mysql'=>'mysql','pgsql'=>'pgsql','sqlite'=>'sqlite','csv'=>null,'oracle'=>'oci','mssql'=>'sqlsrv'];
+        return array_filter(
+            $all,
+            static fn(string $label,string $driver): bool => $required[$driver]===null || in_array($required[$driver],$pdoDrivers,true),
+            ARRAY_FILTER_USE_BOTH
+        );
     }
 
     public static function list(PDO $pdo): array
@@ -70,6 +78,9 @@ final class DataSourceManager
         if(!in_array($driver,self::DRIVERS,true)){
             throw new RuntimeException('Der gewählte Datenquellentyp wird nicht unterstützt.');
         }
+        if(!array_key_exists($driver,self::drivers())){
+            throw new RuntimeException('Der gewählte Datenquellentyp ist in dieser PHP-Laufzeit nicht verfügbar, weil der zugehörige PDO-Treiber fehlt.');
+        }
 
         $config=[];
         if(in_array($driver,['mysql','pgsql','mssql'],true)){
@@ -80,8 +91,14 @@ final class DataSourceManager
                 'username'=>trim((string)($input['username']??'')),
                 'charset'=>trim((string)($input['charset']??($driver==='pgsql'?'UTF8':($driver==='mssql'?'UTF-8':'utf8mb4'))))?:($driver==='pgsql'?'UTF8':($driver==='mssql'?'UTF-8':'utf8mb4')),
             ];
+            if($driver==='pgsql'){
+                $config['schema']=trim((string)($input['schema']??'public'))?:'public';
+                if(preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',(string)$config['schema'])!==1){
+                    throw new RuntimeException('Der PostgreSQL-Schemaname ist ungültig.');
+                }
+            }
             if($config['host']===''||$config['database']===''||$config['username']===''){
-                throw new RuntimeException($driver==='pgsql'?'Für PostgreSQL sind Host, Datenbank und Benutzer erforderlich.':($driver==='mssql'?'Für Microsoft SQL Server sind Host, Datenbank und Benutzer erforderlich.':'Für MySQL/MariaDB sind Host, Datenbank und Benutzer erforderlich.'));
+                throw new RuntimeException($driver==='pgsql'?'Für PostgreSQL sind Host, Datenbank, Schema und Benutzer erforderlich.':($driver==='mssql'?'Für Microsoft SQL Server sind Host, Datenbank und Benutzer erforderlich.':'Für MySQL/MariaDB sind Host, Datenbank und Benutzer erforderlich.'));
             }
         } elseif($driver==='sqlite'){
             $path=trim((string)($input['path']??''));

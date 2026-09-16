@@ -12,6 +12,7 @@ return [
             'host'=>Env::get('QUEUE_DB_HOST',Env::get('ADMIN_DB_HOST','127.0.0.1')),
             'port'=>(int)Env::get('QUEUE_DB_PORT',Env::get('ADMIN_DB_PORT','3306')),
             'database'=>Env::get('QUEUE_DB_DATABASE',Env::get('ADMIN_DB_DATABASE','')),
+            'schema'=>Env::get('QUEUE_DB_SCHEMA',Env::get('ADMIN_DB_SCHEMA','public')),
             'username'=>Env::get('QUEUE_DB_USERNAME',Env::get('ADMIN_DB_USERNAME','')),
             'password'=>Env::get('QUEUE_DB_PASSWORD',Env::get('ADMIN_DB_PASSWORD','')),
             'charset'=>'utf8mb4',

@@ -42,10 +42,18 @@ final class QueueManager
             elseif($driver==='mysql'){$charset=(string)($definition['charset']??'utf8mb4');$dsn="mysql:host={$host};port={$port};dbname={$database};charset={$charset}";}
             else throw new QueueException("DatabaseQueue unterstützt als SQL-Treiber MySQL/MariaDB, PostgreSQL, Oracle XE oder Microsoft SQL Server: {$driver}");
         }
-        return new PDO($dsn,(string)($definition['username']??''),(string)($definition['password']??''),[
+        $pdo=new PDO($dsn,(string)($definition['username']??''),(string)($definition['password']??''),[
             PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES=>false,
         ]);
+        $driver=strtolower(trim((string)($definition['db_driver']??'')));
+        if(in_array($driver,['postgres','postgresql'],true))$driver='pgsql';
+        if($driver==='pgsql'){
+            $schema=trim((string)($definition['schema']??'public')) ?: 'public';
+            if(preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$schema)!==1)throw new QueueException('Ungültiger PostgreSQL-Schemaname für DatabaseQueue.');
+            $pdo->exec('SET search_path TO "'.$schema.'"');
+        }
+        return $pdo;
     }
 }

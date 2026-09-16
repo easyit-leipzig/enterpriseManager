@@ -26,6 +26,7 @@ final class ProjectConfigCompiler
                 'name' => (string) $d['dataSource']['profileName'],
                 'driver' => $driver,
                 'databaseName' => (string) $d['dataSource']['databaseName'],
+                'schemaName' => $driver === 'pgsql' ? (string)($d['dataSource']['schemaName'] ?? 'public') : '',
                 'localPath' => (string) $d['dataSource']['localPath'],
                 'requiresConnectionConfiguration' => (bool) $d['dataSource']['requiresConnectionConfiguration'],
                 'plaintextPasswordStored' => false,

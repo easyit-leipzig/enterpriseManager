@@ -110,6 +110,7 @@ final class ProjectProvisioner
             'host' => '127.0.0.1',
             'port' => $driver === 'oracle' ? 1521 : ($driver === 'pgsql' ? 5432 : ($driver === 'mssql' ? 1433 : 3306)),
             'database' => in_array($driver, ['mysql','pgsql','mssql'], true) ? (string) $d['dataSource']['databaseName'] : '',
+            'schema' => $driver === 'pgsql' ? (string)($d['dataSource']['schemaName'] ?? 'public') : '',
             'username' => '',
             'passwordRef' => '',
             'charset' => $driver === 'oracle' ? 'AL32UTF8' : ($driver === 'pgsql' ? 'UTF8' : ($driver === 'mssql' ? 'UTF-8' : 'utf8mb4')),

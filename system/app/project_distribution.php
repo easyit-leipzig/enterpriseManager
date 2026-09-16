@@ -128,6 +128,8 @@ function enterprise_project_distribution_create(array $env, array $project, int 
     $projectId=(int)($project['id']??0); if($projectId<1)throw new RuntimeException('Ungültiges Projekt.');
     $database=trim((string)($project['database_name']??''));
     if(preg_match('/^[A-Za-z][A-Za-z0-9_]{1,62}$/',$database)!==1)throw new RuntimeException('Ungültiger Projektdatenbankname.');
+    $databaseSchema=$driver==='pgsql'?(trim((string)($env['PROJECT_DB_SCHEMA']??'public')) ?: 'public'):'';
+    if($driver==='pgsql' && preg_match('/^[A-Za-z][A-Za-z0-9_]{0,62}$/',$databaseSchema)!==1)throw new RuntimeException('Ungültiger PostgreSQL-Projektschemaname.');
 
     enterprise_project_distribution_cleanup();
     $distRoot=enterprise_project_distribution_ensure_root();
@@ -181,7 +183,7 @@ function enterprise_project_distribution_create(array $env, array $project, int 
         $pdoRequirement=$driver==='pgsql'?'pdo_pgsql':($driver==='oracle'?'pdo_oci':($driver==='mssql'?'pdo_sqlsrv':'pdo_mysql'));
         $projectMeta=[
             'id'=>$projectId,'source_project_id'=>$projectId,'name'=>(string)($project['name']??''),'slug'=>(string)($project['slug']??''),
-            'product_type'=>'dataform-html5','database_driver'=>$driver,'database_name'=>$database,'description'=>(string)($project['description']??''),
+            'product_type'=>'dataform-html5','database_driver'=>$driver,'database_name'=>$database,'database_schema'=>$databaseSchema,'description'=>(string)($project['description']??''),
             'exported_at'=>gmdate('c'),'exported_by_user_id'=>$userId,
         ];
         $manifest=[
@@ -189,7 +191,7 @@ function enterprise_project_distribution_create(array $env, array $project, int 
             'project'=>$projectMeta,'dataforms'=>$forms,'database'=>$stats+['driver'=>$driver,'sha256'=>hash_file('sha256',$sqlFile)],
             'install'=>['entrypoint'=>'setup.php','requires'=>['PHP 8.1+',$pdoRequirement,'fileinfo'],'writes'=>'config.php'],
         ];
-        $readme="easyIT DataForm HTML5-Anwendung\n==============================\n\nProjekt: ".$projectMeta['name']."\nDataForms: ".count($forms)."\nDatenbank: {$driverLabel}\n\nInstallation:\n1. ZIP in einen Webserverordner entpacken.\n2. setup.php im Browser öffnen.\n3. {$driverLabel}-Zugangsdaten eingeben.\n4. Der enthaltene Datenbanksnapshot wird importiert und config.php erzeugt.\n5. Danach index.php öffnen.\n\nDas Paket enthält ausschließlich die Projekt-Runtime, DataForm-Seiten, erforderliche Bilder/Assets, Projektmedien und den Datenbanksnapshot. easyIT Enterprise ist nicht enthalten.\n";
+        $readme="easyIT DataForm HTML5-Anwendung\n==============================\n\nProjekt: ".$projectMeta['name']."\nDataForms: ".count($forms)."\nDatenbank: {$driverLabel}".($driver==='pgsql'?' · Schema: '.$databaseSchema:'')."\n\nInstallation:\n1. ZIP in einen Webserverordner entpacken.\n2. setup.php im Browser öffnen.\n3. {$driverLabel}-Zugangsdaten eingeben.\n4. Der enthaltene Datenbanksnapshot wird importiert und config.php erzeugt.\n5. Danach index.php öffnen.\n\nDas Paket enthält ausschließlich die Projekt-Runtime, DataForm-Seiten, erforderliche Bilder/Assets, Projektmedien und den Datenbanksnapshot. easyIT Enterprise ist nicht enthalten.\n";
 
         $zip=new ZipArchive();
         if($zip->open($path,ZipArchive::CREATE|ZipArchive::OVERWRITE)!==true)throw new RuntimeException('Anwenderpaket-ZIP konnte nicht erzeugt werden.');
@@ -214,7 +216,7 @@ function enterprise_project_distribution_create(array $env, array $project, int 
             enterprise_project_distribution_add_text($zip,$folder.'/install/.htaccess',"Require all denied\nDeny from all\n");$fileCount++;
             enterprise_project_distribution_add_text($zip,$folder.'/storage/dataform/uploads/.htaccess',"Options -Indexes -ExecCGI\nRequire all denied\nDeny from all\n");$fileCount++;
             $port=$driver==='pgsql'?5432:($driver==='oracle'?1521:($driver==='mssql'?1433:3306));
-            enterprise_project_distribution_add_text($zip,$folder.'/config.php.example',"<?php\ndeclare(strict_types=1);\nreturn ['db_driver'=>'{$driver}','db_host'=>'localhost','db_port'=>{$port},'db_service'=>'".($driver==='oracle'?'XEPDB1':'')."','db_name'=>'".addslashes($database)."','db_user'=>'','db_password'=>'','project_id'=>".$projectId.",'project_name'=>'".addslashes((string)$projectMeta['name'])."'];\n");$fileCount++;
+            enterprise_project_distribution_add_text($zip,$folder.'/config.php.example',"<?php\ndeclare(strict_types=1);\nreturn ['db_driver'=>'{$driver}','db_host'=>'localhost','db_port'=>{$port},'db_service'=>'".($driver==='oracle'?'XEPDB1':'')."','db_name'=>'".addslashes($database)."','db_schema'=>'".addslashes($databaseSchema)."','db_user'=>'','db_password'=>'','project_id'=>".$projectId.",'project_name'=>'".addslashes((string)$projectMeta['name'])."'];\n");$fileCount++;
             enterprise_project_distribution_add_text($zip,$folder.'/README.txt',$readme);$fileCount++;
             $fileCount+=enterprise_project_distribution_add_project_uploads($zip,$appRoot,$folder,$projectId);
         }finally{if(!$zip->close())throw new RuntimeException('Anwenderpaket-ZIP konnte nicht abgeschlossen werden.');}
