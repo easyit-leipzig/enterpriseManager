@@ -1,0 +1,71 @@
+easyIT DataForm5 License Runtime – Validation Report
+Date: 2026-09-16
+Version: DataForm5-License-Runtime-0.1.0-2026-09-16
+
+== Environment ==
+PHP 8.4.23 (cli) (built: Jul  3 2026 12:26:56) (NTS)
+Copyright (c) The PHP Group
+Sodium: yes
+PDO drivers: 
+
+== PHP lint ==
+PHP lint: files=39 failures=0
+
+== Package selftest ==
+server app                                PASS
+server compiler protected                 PASS
+server action resolver protected          PASS
+designer validator protected              PASS
+designer service protected                PASS
+client api                                PASS
+client runtime                            PASS
+client designer                           PASS
+client bridge                             PASS
+offline runtime cache                     PASS
+production admin cli                      PASS
+definition publish cli                    PASS
+patch installer                           PASS
+server private key not shipped            PASS
+config is example only                    PASS
+FINAL STATUS: PASSED
+
+== Runtime unit gate ==
+valid definition accepted                       PASS
+dataset event rejected in dataform scope        PASS
+compiler keeps addClass                         PASS
+compiler keeps addJavaScript                    PASS
+readonly field excluded                         PASS
+delete without resource rejected                PASS ACTION_RESOURCE_INVALID
+bulk ids bound                                  PASS
+relation binding resolved                       PASS
+FINAL STATUS: PASSED
+
+== Ed25519 server key/signature smoke ==
+key_id=SERVER-2026-01
+public_key=h0iS6rHJnL1ub7OIIhmC7WCSRUIBgRLYwJGQGB+H7Hg=
+PASS - server Ed25519 sign/verify
+
+== Migration DDL static smoke ==
+PASS - parsed/executed 13 CREATE TABLE statements (SQLite syntax smoke)
+
+== STAND-4 patch/security smoke ==
+DATAFORM_LICENSE_PATCH_APPLIED
+backup=/tmp/tmp.GiYpZNQSXH/enterpriseManager/products/dataform/records.php.pre-license-20260916-131206.bak
+No syntax errors detected in /tmp/tmp.GiYpZNQSXH/enterpriseManager/products/dataform/records.php
+enterprise licensing client                     PASS
+runtime bridge                                  PASS
+records runtime boot                            PASS
+records write authorization                     PASS
+protected server core absent from enterprise    PASS
+no server private material in enterprise        PASS
+server compiler exists                          PASS
+server action resolver exists                   PASS
+server signer exists                            PASS
+server public webroot isolated                  PASS
+FINAL STATUS: PASSED
+PASS - STAND-4 runtime bridge injection markers present
+
+== Scope limitations ==
+- Live MySQL/MariaDB/PostgreSQL migration/API integration was not executed in this container because PDO has no database drivers here.
+- The package is a cumulative drop-in/patch for the documented STAND-4 DataForm/RecordSet structure; the current complete enterpriseManager ZIP was not present as an editable sandbox artifact.
+- HA load balancer/replica provisioning is architecture-ready but not provisioned by this package.

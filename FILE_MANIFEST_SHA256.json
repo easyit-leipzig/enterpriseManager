@@ -1,0 +1,242 @@
+{
+  "version": "DataForm5-License-Runtime-0.1.0-2026-09-16",
+  "generated_at": "2026-09-16",
+  "file_count": 47,
+  "files": [
+    {
+      "path": "README.md",
+      "size": 4503,
+      "sha256": "7f4c4b2c723d3eba387d9b941ca1323a334d26baa42dfaa81e5fb1a931f80e23"
+    },
+    {
+      "path": "VALIDATION_REPORT_2026-09-16.txt",
+      "size": 3130,
+      "sha256": "baaeb62d8f80a53a1767ca32938dc9c03ef4c93f32bf822972e5c199ecdae5b0"
+    },
+    {
+      "path": "VERSION",
+      "size": 43,
+      "sha256": "b0c423375dd412841d629b0d4265fbdf645603cb49f831c2dd2935764d6f5557"
+    },
+    {
+      "path": "docs/API_V1.md",
+      "size": 1307,
+      "sha256": "3698dd08552fad820ced5baab913ccf3910fc7a1425a41541753c38edaac122e"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STATUS.md",
+      "size": 2303,
+      "sha256": "89eac66ed367e19b8bae5d2837ddfc8608cd6668a273f985083620e1e560f5a7"
+    },
+    {
+      "path": "docs/INSTALLATION_WINDOWS_XAMPP.md",
+      "size": 3620,
+      "sha256": "1b01fa9b8498156d5aa356742e9b667787817fddf2d8e6eaec2851881146de8e"
+    },
+    {
+      "path": "easyit-license-server/.gitignore",
+      "size": 51,
+      "sha256": "588d334c685ce91b596cd82dd2c3fe32355062cfd046f1483c50ec41032e3ca0"
+    },
+    {
+      "path": "easyit-license-server/bin/admin.php",
+      "size": 7538,
+      "sha256": "7af4b7147d84bcc6535fb6070d562861c278b9503c8b750a350ec5a382c0c395"
+    },
+    {
+      "path": "easyit-license-server/bin/generate-server-key.php",
+      "size": 780,
+      "sha256": "70286a3abb0b5f6e014ff74c47698938e1d812213f6acf32204d9add4ec75fdc"
+    },
+    {
+      "path": "easyit-license-server/bin/migrate.php",
+      "size": 266,
+      "sha256": "68122d634d6d33f54dc9008cf1abc4361ac481303161c49b3751b2311efb9484"
+    },
+    {
+      "path": "easyit-license-server/bin/seed-dev-license.php",
+      "size": 2414,
+      "sha256": "ef7ab7ea2694ca7feb714249dfdf9888225fc219a0a303393dcb6267b3dd6343"
+    },
+    {
+      "path": "easyit-license-server/bootstrap.php",
+      "size": 545,
+      "sha256": "88d1c362affc7f2c4f1e967e751584c645e4dbfa563b9e8b2feb0a91447a5b30"
+    },
+    {
+      "path": "easyit-license-server/config/app.example.php",
+      "size": 1242,
+      "sha256": "94d29a85b8a38ef1e7457481a903acca138e209015afdaca65328eccb7f8bceb"
+    },
+    {
+      "path": "easyit-license-server/public/.htaccess",
+      "size": 121,
+      "sha256": "12dc0006624c3d4d740f7e9450bac36ebd0db4e4c2976c86a5aa40a580b45766"
+    },
+    {
+      "path": "easyit-license-server/public/index.php",
+      "size": 135,
+      "sha256": "8b8fa9605ece66bf3b6fca35ded97f2dbc10667e7f85bf7134c5bca0650ca72d"
+    },
+    {
+      "path": "easyit-license-server/src/App/Application.php",
+      "size": 5033,
+      "sha256": "8f627552f82db618c93511d643975335a43d18ff8b3256370a0c0ea39476bb4e"
+    },
+    {
+      "path": "easyit-license-server/src/Database/Connection.php",
+      "size": 726,
+      "sha256": "9070fbda6b4444eb7202028a622e1c74e8c461a8223ab0c67e59f199410aee3b"
+    },
+    {
+      "path": "easyit-license-server/src/Database/MigrationRunner.php",
+      "size": 5392,
+      "sha256": "3435108acafd00ca62874575a369eab023d4c7405332174d95e0c0c90344dfa9"
+    },
+    {
+      "path": "easyit-license-server/src/Http/ApiResponder.php",
+      "size": 976,
+      "sha256": "0fdb1033d91073c7ab394a2c3519978f29ed95eff35fa9d1dd09f156a2eca941"
+    },
+    {
+      "path": "easyit-license-server/src/Http/Http.php",
+      "size": 586,
+      "sha256": "37ce3253352777d84cd4b78a050efb7563d4f755a83e5aa62203c38f043a6849"
+    },
+    {
+      "path": "easyit-license-server/src/ProtectedCore/ActionResolver.php",
+      "size": 1941,
+      "sha256": "a68f608df3901ab84047e378dcd6111f9f0eb501707e45fe3b80a6be0fa92ef5"
+    },
+    {
+      "path": "easyit-license-server/src/ProtectedCore/DataFormCompiler.php",
+      "size": 1538,
+      "sha256": "adffab3ab8783c07e61d0bb2c63041315eb56083639dd10a61a825f048e70d91"
+    },
+    {
+      "path": "easyit-license-server/src/ProtectedCore/DefinitionValidator.php",
+      "size": 2942,
+      "sha256": "aba6f06fca19b429870b59ed54349623699d9c639a7798a0aae13ec7be2a9618"
+    },
+    {
+      "path": "easyit-license-server/src/Security/KeyCodec.php",
+      "size": 403,
+      "sha256": "cd18ff88e942c49737a6681546a341ec31e7f3b7a0be7f77318e94ccb6fd1eb2"
+    },
+    {
+      "path": "easyit-license-server/src/Security/RequestVerifier.php",
+      "size": 2390,
+      "sha256": "fa7eb6b805aca611507197f9a4396f8cc617204126ab44ee2d14b96783b6b880"
+    },
+    {
+      "path": "easyit-license-server/src/Security/ServerSigner.php",
+      "size": 1387,
+      "sha256": "613eda4537170f59f04392082ff9314788aa7cc76b3a42efc62ea97c2a30bea8"
+    },
+    {
+      "path": "easyit-license-server/src/Service/ActivationService.php",
+      "size": 4183,
+      "sha256": "f090856c0210af774de8fbe3506ab3c10f327da00e36dc7d31f3483909ea8b8f"
+    },
+    {
+      "path": "easyit-license-server/src/Service/AuditService.php",
+      "size": 716,
+      "sha256": "48509d3a5235ab4f652f9b8314ba0a0d0e355463b404b077be87c7f8d9f188f6"
+    },
+    {
+      "path": "easyit-license-server/src/Service/DesignerService.php",
+      "size": 4867,
+      "sha256": "f53378bbac5929493efb0e51ecf9eea6d74fab1f901fce0402c898cb9dcef8b9"
+    },
+    {
+      "path": "easyit-license-server/src/Service/LicenseService.php",
+      "size": 2339,
+      "sha256": "44f7b9ad03fb83017a83887acaa21860c13c22060ecf1de7b194f5cdcc33c19f"
+    },
+    {
+      "path": "easyit-license-server/src/Service/RuntimeService.php",
+      "size": 9317,
+      "sha256": "a5714fc1b0e244fd3fa451aa231ecaba3d931ef3e453327ae251ad1b64d4b925"
+    },
+    {
+      "path": "easyit-license-server/src/Support/Id.php",
+      "size": 229,
+      "sha256": "302054a3123431cf71f3d971d69d6b35e85ea014705ecc5cd20af1756489da87"
+    },
+    {
+      "path": "easyit-license-server/src/Support/Json.php",
+      "size": 492,
+      "sha256": "eca88afbf631d3c4c3a832c0c4f40f6ff13543ef91440fe3daa59db33958b557"
+    },
+    {
+      "path": "enterprise-integration/config/licensing.example.php",
+      "size": 509,
+      "sha256": "b0e76feb3c915fca39a40b415bdf2ec5f082e215ab20af6f9119c0451833b992"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/Autoload.php",
+      "size": 264,
+      "sha256": "49c83f7b1bd6148fa3c7ff5ed906ed2e6672eaef73f821f4dcd28657148bbcf0"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/DataFormDesignerClient.php",
+      "size": 912,
+      "sha256": "d5a2b0c8d04cd442649309d9f9050296af87f8b0759aa1002577d61693c03f75"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/DataFormRuntimeClient.php",
+      "size": 4771,
+      "sha256": "1e79973c600d3f850fbecdf16c766dd8bf7a988b9f478e13dd0cebb027e58b9c"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/EnterpriseRuntimeBridge.php",
+      "size": 2284,
+      "sha256": "d58c3e25376e1d5db79ef9d81cce3e4a31bbe95fac2da4d6b9d28bf1ef9dd0fc"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/InstallationIdentity.php",
+      "size": 1491,
+      "sha256": "3e4a4c0aa15c9198cc4fcbc08855afe29b86a745b851b8b56c430c9510252c7b"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/LicenseApiClient.php",
+      "size": 6144,
+      "sha256": "69d48ce0ce182812d62538014e97338d8273f1f5385c663c96c734c7270207d0"
+    },
+    {
+      "path": "enterprise-integration/system/licensing/Transport.php",
+      "size": 1692,
+      "sha256": "4803de35c1c8f51ad13f4f969a9fe1830325d23f11cf7204cb0f9b3121d2c637"
+    },
+    {
+      "path": "enterprise-integration/tools/activate_license.php",
+      "size": 655,
+      "sha256": "b0fe5f2eb880b6d9d1cf4ef8b6684d4dbe0423b08fa1f56f2302a83fd5702898"
+    },
+    {
+      "path": "enterprise-integration/tools/apply_to_enterpriseManager.php",
+      "size": 3450,
+      "sha256": "e3be1afd354941bd1c42e28b2ba872e5b776e5299dde49afc777420baab27323"
+    },
+    {
+      "path": "enterprise-integration/tools/publish_dataform_definition.php",
+      "size": 1613,
+      "sha256": "76767b5e4c7fd95b4f3649b46a37550e7eda072e9bb3e6224598602a18387975"
+    },
+    {
+      "path": "gates/DATAFORM_LICENSE_SECURITY_GATE.php",
+      "size": 2732,
+      "sha256": "9eabbc006360b67e6a229781b03a86d72419c5b2720d2589ae013b6e35b42b87"
+    },
+    {
+      "path": "gates/PACKAGE_SELFTEST.php",
+      "size": 1924,
+      "sha256": "243f245dd5b59eecfd6d628caea6835fe902bc6f9f0bf7ad2917dbc92299f6ed"
+    },
+    {
+      "path": "gates/RUNTIME_UNIT_GATE.php",
+      "size": 2536,
+      "sha256": "9eb2fa192e673e7126313cc3289f5225bab13e9f81c9020f502b5a7e56cd48cd"
+    }
+  ]
+}

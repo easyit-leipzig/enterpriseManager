@@ -1,34 +1,75 @@
-# easyIT Enterprise Manager RC1.8-FC1-HF76
+# easyIT Enterprise / DataForm5 – servergebundene Lizenz- und Runtime-Architektur
 
-Bereinigtes Laufzeitpaket des easyIT Enterprise Managers mit integriertem DataForm5.
+Stand: 2026-09-16  
+Version: `DataForm5-License-Runtime-0.1.0-2026-09-16`
 
-## Startverhalten
+Dieses Paket setzt den ausführbaren Kern der Phasen 1–12 um: Der auslieferbare `enterpriseManager` enthält nur Client/Shell/DB-Adapter. Die funktionskritische DataForm-Logik verbleibt im getrennten `easyit-license-server` und wird nach erfolgreicher Lizenz-/Installationsprüfung für konkrete Runtime- und Action-Entscheidungen verwendet.
 
-- `index.php` startet immer auf der Administrator-Anmeldung.
-- Ist der Administrationsspeicher noch nicht eingerichtet, wird **Setup durchführen** angeboten.
-- Ist der Administrationsspeicher eingerichtet, aber noch kein aktiver Superadministrator vorhanden, kann das erste Superadministratorkonto direkt auf der Startseite angelegt werden.
-- Existiert bereits ein aktiver Superadministrator, wird ausschließlich die Anmeldung angezeigt.
+## Schutzgrenze
 
-## Datenquellen
+**Nur Server:** `DataFormCompiler`, `DefinitionValidator`, `ActionResolver`, Designer-Revisionierung, Lizenz-/Installationsprüfung, Server-Signierung.  
+**Lokal:** `LicenseApiClient`, `DataFormRuntimeClient`, `DataFormDesignerClient`, `EnterpriseRuntimeBridge`, Installationsidentität und Runtime-Cache.
 
-Administrations- und Projektspeicher werden unabhängig gewählt. Datenbanktypen werden nur angeboten, wenn der dafür notwendige PDO-Treiber in der aktuellen PHP-Laufzeit vorhanden ist. CSV benötigt keinen PDO-Treiber und bleibt unabhängig davon verfügbar.
+Neue DataForms beziehungsweise neue veröffentlichte Revisionen können ohne den geschützten Server-Core nicht erzeugt werden. `create`, `update`, `delete` und Relation-Schreibaktionen benötigen eine serverseitige Action-Entscheidung. Kundendatensätze selbst werden dabei nicht an den Lizenzserver übertragen.
 
-Für PostgreSQL wird jede Verbindung ausdrücklich als **Datenbank-/Schema-Kombination** konfiguriert. Setup und Datenbank-Assistent legen fehlende PostgreSQL-Datenbanken und Schemas an, verifizieren beide Objekte und speichern `ADMIN_DB_DATABASE` + `ADMIN_DB_SCHEMA` bzw. `PROJECT_DB_DATABASE` + `PROJECT_DB_SCHEMA`.
+## Enthalten
 
-Standardzeitzone im Setup ist `Europe/Berlin`.
+- Ed25519-Serveridentität und Ed25519-Installationsidentitäten
+- Aktivierung mit Installationslimit
+- Module: `dataform`, `designer`, `export`, `api`, `themes`
+- `runtime/start`, `runtime/renew`, `runtime/action`, `runtime/action/result`, `runtime/end`
+- signierte Runtime-Manifeste und Action-Decisions
+- Nonce-/Replay-Schutz und Lizenz-/Installationsgenerationen
+- signierter lokaler Lease-/Grace-Cache einschließlich Clock-Rollback-Prüfung
+- Designer-API `validate`, `compile`, `publish`, `revisions`
+- versionierte DataForm-Revisionen
+- Wartungsmodus `off|read_only|full`
+- produktive Lizenzverwaltung per Server-CLI
+- STAND-4-kompatibler Patch-Installer für `products/dataform/records.php`
+- Release-/Security-Gates gegen versehentlich ausgelieferten Server-Core/private Server-Keys
 
-## Datenbank-Benutzerverwaltung
+## Verzeichnisse
 
-Für konfigurierte **MySQL/MariaDB- und PostgreSQL-Server** steht unter **Benutzer & Rechte → DB-Benutzer** eine getrennte technische Benutzerverwaltung zur Verfügung. Administrations- und Projektspeicher können unabhängig ausgewählt werden. Datenbankkonten lassen sich anlegen, sperren/freischalten, mit einem neuen Kennwort versehen und löschen. Rechte werden zielbezogen als **kein Zugriff**, **nur lesen**, **lesen/schreiben** oder **Vollzugriff** vergeben. Bei PostgreSQL ist die Berechtigung immer an die Kombination **Datenbank + Schema** gebunden. Das aktuell verwendete Laufzeitkonto und bekannte Systemkonten sind gegen Änderung und Löschen geschützt.
+- `easyit-license-server/` – **nicht an Kunden ausliefern**
+- `enterprise-integration/` – auslieferbarer Client plus Patch-/Aktivierungswerkzeuge
+- `gates/` – Syntax-/Runtime-/Security-Gates
+- `docs/` – API, Installation, Umsetzungsstatus
 
-Die Oberfläche vergibt bewusst keine globalen MySQL-Administratorrechte und keine PostgreSQL-SUPERUSER-/CREATEROLE-Rechte. Das zur Verwaltung verwendete Konto muss selbst die serverseitigen Rechte `CREATE USER`/`ALTER USER` bzw. `CREATEROLE` sowie die erforderlichen GRANT-Rechte besitzen.
+## Schnellstart unter XAMPP
 
-## Paketbereinigung
+1. `easyit-license-server/config/app.example.php` nach `config/app.php` kopieren und DB-Zugang setzen.
+2. `php easyit-license-server/bin/generate-server-key.php`
+3. `php easyit-license-server/bin/migrate.php`
+4. Produktive Lizenz anlegen, z. B.:
 
-Dieses Paket enthält keine Test-Suites, Testreports, alten Hotfix-/Phasenstände, historischen Release-Notizen, Build-Gates, Beispiel-Backups, Beispiel-Exporte, Cache-Dateien oder Laufzeit-Logs. Die aktuelle SDK-Referenz und die zur Anwendung gehörenden HTML-Hilfen bleiben enthalten.
+   `php easyit-license-server/bin/admin.php customer:create --name="Muster GmbH"`
 
-Installation: siehe `INSTALL.md`.
-## Projektverwaltung und Neuaufbau
+   danach mit der ausgegebenen Customer-ID:
 
-Nach der Administrator-Anmeldung öffnet sich für Administratoren direkt die Projektliste mit vollständigen CRUD-Aktionen einschließlich **Projekt löschen**. Wird ein physischer Projektspeicher absichtlich entfernt, bleibt die Projektregistrierung erhalten; die Projektliste kennzeichnet den fehlenden Speicher und bietet **Speicher neu aufbauen** an. Bei PostgreSQL erfolgt dieser Neuaufbau über die konfigurierte Maintenance-Datenbank und erzeugt die fehlende Datenbank-/Schema-Kombination erneut. Ein vorhandener Projektspeicher wird dabei nicht überschrieben.
+   `php easyit-license-server/bin/admin.php license:create --customer=CUS-... --modules=dataform,designer --max-installations=3`
 
+5. Webroot des Lizenzservers auf `easyit-license-server/public/` setzen.
+6. Integration anwenden:
+
+   `php enterprise-integration/tools/apply_to_enterpriseManager.php --root=D:\xampp\htdocs\enterpriseManager`
+
+7. In `enterpriseManager/config/licensing.php` `server_url` und den Public Key unter `trusted_server_keys` eintragen.
+8. Installation aktivieren:
+
+   `php D:\xampp\htdocs\enterpriseManager\tools\activate_license.php --root=D:\xampp\htdocs\enterpriseManager --license=LIC-....<secret>`
+
+9. Vorhandene/neu erzeugte Definition veröffentlichen:
+
+   `php D:\xampp\htdocs\enterpriseManager\tools\publish_dataform_definition.php --root=D:\xampp\htdocs\enterpriseManager --project=1 --dataform=1 --definition=D:\definition.json`
+
+10. Gate:
+
+   `php gates/DATAFORM_LICENSE_SECURITY_GATE.php --enterprise=D:\xampp\htdocs\enterpriseManager --server=D:\xampp\htdocs\easyit-license-server`
+
+## Wichtig zur aktuellen Integration
+
+Der Patch-Installer ist gezielt auf den nachgewiesenen STAND-4-`records.php`-/`DataFormRecordSet`-Aufbau ausgelegt. Das aktuell vollständige spätere `enterpriseManager`-Basis-ZIP stand beim Erzeugen dieses Pakets nicht als entpackbares Basisartefakt zur Verfügung. Deshalb wird kein erfundener Komplettstand überschrieben. Client, Server, Designer-API und Gates sind vollständig im Paket; die bestehende Designer- und Superadmin-Oberfläche wird erst nach Einspielen in den konkreten aktuellen Projektbaum an deren reale Routen/Seiten gebunden.
+
+## Sicherheitsgrenze
+
+Der Schutz betrifft die DataForm-Programmlogik und Lizenznutzung. Ein Administrator der Kundendatenbank kann seine eigenen Daten selbstverständlich außerhalb von DataForm direkt verändern; eine Lizenzarchitektur kann und soll das nicht verhindern.
